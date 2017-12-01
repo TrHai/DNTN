@@ -1,3 +1,5 @@
+
+
 package com.example.bruce.myapp.Adapter;
 
 import android.content.Context;
@@ -15,11 +17,14 @@ import com.example.bruce.myapp.Data.Comment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
+
+
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -52,7 +57,7 @@ public class Comment_Adapter extends RecyclerView.Adapter<Comment_Adapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-
+       //xử lý sự kiện click likebutton
 
         Comment cC = comment_contructors.get(position);
 
@@ -120,45 +125,6 @@ public class Comment_Adapter extends RecyclerView.Adapter<Comment_Adapter.ViewHo
 
     public void ClickButtonLike(LikeButton btnLikethumb, final TextView likeNumber, final String idComment, final Context context , final Comment cC){
 
-//        btnLikethumb.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Like_Adapter like_adapter=new Like_Adapter(cC.userID,cC.locationID);
-//                mDataLike.child("Likes").child(mAuth.getCurrentUser().getUid()).push().setValue(like_adapter);
-//                likeNumber.setText(String.valueOf(cC.like + 1));
-//                mDataLike.child("Comments").addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                        Comment comment_contructor = dataSnapshot.getValue(Comment.class);
-//                        if(comment_contructor.date.equals(cC.date)&&comment_contructor.userID.equals(cC.userID)){
-//                            mDataLike.child("Comments").child(dataSnapshot.getKey()).child("like").setValue(cC.like + 1);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-//
-//            }
-//        });
         // fix update Button like
         //Xử lý button like
         btnLikethumb.setOnLikeListener(new OnLikeListener() {

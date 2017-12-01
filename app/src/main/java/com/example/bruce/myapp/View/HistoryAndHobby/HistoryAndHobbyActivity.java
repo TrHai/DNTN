@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.example.bruce.myapp.Adapter.HistoryAdapter;
 import com.example.bruce.myapp.CircleTransform;
 import com.example.bruce.myapp.Data.Tourist_Location;
+import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.GPSTracker;
 import com.example.bruce.myapp.Presenter.HistoryAndHobby.PHistoryAndHobby;
 import com.example.bruce.myapp.Presenter.MenuFragment.PMenuFragment;
@@ -36,8 +37,11 @@ import com.example.bruce.myapp.View.BigMap.BigMapsActivity;
 import com.example.bruce.myapp.View.Information_And_Comments.InformationAndCommentsActivity;
 import com.example.bruce.myapp.View.Login.LoginActivity;
 import com.example.bruce.myapp.View.MenuFragment.IViewMenuFragment;
+import com.example.bruce.myapp.View.Team.TeamActivity;
+import com.example.bruce.myapp.View.User.UserProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -70,6 +74,12 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     String history = "";
     ArrayList<Tourist_Location> allLocation;
     ProgressDialog progressDialog;
+    UserProfile userProfile;
+
+    String[] menuItem = {};
+    private Dialog dialogCreateTeam ;
+    private TextView txtTeamName;
+    private Button btnOk,btnCancel;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,15 +125,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     }
 
     private void setUpListViewMenu(final ListView listView){
-        String[] menuItem = {"My profile",
-                "Map",
-                "Log out",
-                "Help"};
-
-        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
-                menuItem);
-        listView.setAdapter(listViewAdapter);
+        presenterHistoryAndHobby.receivedTeamChecker(user.getUid(),menuItem,listView);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -142,13 +144,45 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                     startActivity(target);
                 }
                 if(value == "My profile"){
-//                    getActivity().finish();
-//                    Intent target = new Intent(getActivity(), User_Profile.class);
-//                    startActivity(target);
+                    finish();
+                    Intent target = new Intent(HistoryAndHobbyActivity.this, UserProfileActivity.class);
+                    ArrayList<UserProfile> listUser=new ArrayList<>();
+                    listUser.add(userProfile);
+                    target.putParcelableArrayListExtra("user",listUser);
+                    startActivity(target);
+                }
+                if(value=="Team")
+                {
+                    finish();
+                    Intent target = new Intent(HistoryAndHobbyActivity.this, TeamActivity.class);
+                    startActivity(target);
+                }
+                if(value=="Create Team")
+                {
+                    dialogCreateTeam = new Dialog(HistoryAndHobbyActivity.this);
+                    dialogCreateTeam.setContentView(R.layout.dialog_create_team);
+                    txtTeamName=dialogCreateTeam.findViewById(R.id.txtTeamName);
+                    btnOk=dialogCreateTeam.findViewById(R.id.btnOk);
+                    btnCancel=dialogCreateTeam.findViewById(R.id.btnCancel);
+                    btnOk.setOnClickListener(v -> {
+                        String TeamName=txtTeamName.getText().toString();
+                        FirebaseDatabase.getInstance().getReference("CheckTeam").child(user.getUid()).child("Captain").setValue(user.getUid());
+                        FirebaseDatabase.getInstance().getReference("TeamUser").child(user.getUid()).child("TeamName").setValue(TeamName);
+                        FirebaseDatabase.getInstance().getReference("TeamUser").child(user.getUid()).child("Member").setValue(user.getUid());
+                        dialogCreateTeam.dismiss();
+                    });
+                    dialogCreateTeam.show();
+                    btnCancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialogCreateTeam.dismiss();
+                        }
+                    });
                 }
             }
         });
-    }
+            }
+
     private void initialize() {
         imgFriendProfilePicture = findViewById(R.id.imgUser);
         txtGreeting = findViewById(R.id.txtDisplayName);
@@ -223,6 +257,11 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     }
 
     @Override
+    public UserProfile UserProfile(UserProfile User) {
+        return this.userProfile = User;
+    }
+
+    @Override
     public ArrayList<Tourist_Location> GetLocationData(ArrayList<Tourist_Location> tourist_locations) {
 
         //lấy dữ liệu của tất cả các địa điểm để truyền qua activity khác
@@ -248,6 +287,30 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         hashCodeListRecommeded.append(tourist_locations.hashCode());
         listRecommended = tourist_locations;
         return null;
+    }
+
+    @Override
+    public void HasTeam(String[] menuItem, ListView listView) {
+        menuItem = new String[]{"My profile",
+                "Map",
+                "Log out",
+                "Team"};
+        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+                menuItem);
+        listView.setAdapter(listViewAdapter);
+    }
+
+    @Override
+    public void HasNoTeam(String[] menuItem, ListView listView) {
+        menuItem = new String[]{"My profile",
+                "Map",
+                "Log out",
+                "Create Team"};
+        ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+                menuItem);
+        listView.setAdapter(listViewAdapter);
     }
 
     @Override

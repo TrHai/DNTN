@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.widget.ListView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -129,6 +130,8 @@ public class MHistoryAndHobby {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
                 callback.GetUserHistory(userProfile.Hobbie);
+                callback.UserProfile(userProfile);
+
             }
 
             @Override
@@ -243,6 +246,25 @@ public class MHistoryAndHobby {
 //        }
         callback.returnRecommendedList(returnList);
     }
+    public void handleTeamCheker(String idUser, String[] menuItem, ListView listView)
+    {
+        FirebaseDatabase.getInstance().getReference("CheckTeam").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(idUser).exists())
+                {
+                    callback.HasTeam(menuItem,listView);
+                }
+                else {
+                    callback.HasNoTeam(menuItem,listView);
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }

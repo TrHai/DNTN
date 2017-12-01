@@ -61,6 +61,10 @@
             android:name=".View.Information_And_Comments.InformationAndCommentsActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".View.User.UserProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".View.Team.TeamActivity"></activity>
     </application>
 
 </manifest>

@@ -2,8 +2,10 @@ package com.example.bruce.myapp.Presenter.HistoryAndHobby;
 
 import android.app.Activity;
 import android.content.Context;
+import android.widget.ListView;
 
 import com.example.bruce.myapp.Data.Tourist_Location;
+import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Model.MHistoryAndHobby;
 import com.example.bruce.myapp.View.HistoryAndHobby.IViewHistoryAndHobby;
 
@@ -52,7 +54,9 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
         modelHistoryAndHobby.handleRecommendeToUser(behavior,history,tourist_locations);
 
     }
-
+    public void receivedTeamChecker(String idUser, String[] menuItem, ListView listView){
+        modelHistoryAndHobby.handleTeamCheker(idUser,menuItem,listView);
+    }
     @Override
      public void EnableGPS_API22() {
 
@@ -84,6 +88,11 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
     }
 
     @Override
+    public UserProfile UserProfile(UserProfile User) {
+        return callbackToView.UserProfile(User);
+    }
+
+    @Override
     public ArrayList<Tourist_Location> GetUserHistoryLocation(ArrayList<Tourist_Location> tourist_locations) {
 
         return callbackToView.GetUserHistoryLocation(tourist_locations);
@@ -92,5 +101,15 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
     @Override
     public ArrayList<Tourist_Location> returnRecommendedList(ArrayList<Tourist_Location> tourist_locations) {
         return callbackToView.returnRecommendedList(tourist_locations);
+    }
+
+    @Override
+    public void HasTeam(String[] menuItem, ListView listView) {
+        callbackToView.HasTeam(menuItem,listView);
+    }
+
+    @Override
+    public void HasNoTeam(String[] menuItem, ListView listView) {
+        callbackToView.HasNoTeam(menuItem,listView);
     }
 }

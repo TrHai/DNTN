@@ -67,4 +67,10 @@ public class InformationAndCommentsActivity extends AppCompatActivity {
     private void setupTabLayout(TabLayout tabLayout, ViewPager viewPager){
         tabLayout.setupWithViewPager(mViewPage);
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

@@ -56,7 +56,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
 
-            //
+            itemView.setOnClickListener(this);
             // imageView.setOnClickListener(this);
 
             imageView = itemView.findViewById(R.id.imageHistory);
@@ -66,7 +66,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         @Override
         public void onClick(View v) {
             if(clicklistener != null){
-                clicklistener.onClickItemRecyclerView(v,getPosition());
+
+                clicklistener.onClickItemRecyclerView(v,getPosition(),String.valueOf(tourist_locations.hashCode()));
             }
         }
     }
@@ -76,6 +77,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public interface RecyclerViewClicklistener{
 
-        void onClickItemRecyclerView(View view, int position);
+        void onClickItemRecyclerView(View view, int position, String listId);
     }
 }

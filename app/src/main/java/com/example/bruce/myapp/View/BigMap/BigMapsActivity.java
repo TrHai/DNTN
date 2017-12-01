@@ -55,6 +55,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
     GPSTracker gps;
     private LatLng mLocation;
     //direction
+    //lấy tọa độ gps để tìm đường từ mình đến địa điểm du lịch
     private String origin;
     private String destination;
     //component
@@ -80,6 +81,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         tourist_locations = getIntent().getParcelableArrayListExtra("allLocation");
 
 
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -87,8 +89,8 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
         initialize();
         textViewToogle(txtToogle,drawer);
-
     }
+
 
     private void initialize(){
 
@@ -134,19 +136,20 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        gps = new GPSTracker(this);
-        mLocation = new LatLng(gps.getLatitude(),gps.getLongtitude());
-
-        //lấy tọa độ gps để tìm đường từ mình đến địa điểm du lịch
-        origin = mLocation.latitude+", "+mLocation.longitude;
-
 
         //Google maps controller
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
+        gps = new GPSTracker(this);
+        mLocation= new LatLng(gps.getLatitude(),gps.getLongtitude());
+        origin = mLocation.latitude+", "+mLocation.longitude;
         markAllLocation(tourist_locations,mMap,recyclerView_ListLocation,adapter,mLocation);
+
+        if(getIntent().getStringExtra("destination") != null){
+            sendRequest(origin,getIntent().getStringExtra("destination"));
+        }
     }
 
     private void markAllLocation(ArrayList<Tourist_Location> tourist_locations,GoogleMap mMap,RecyclerView recyclerView_ListLocation, MenumapAdapter adapter, LatLng mLocation){
@@ -199,7 +202,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         Button btnDirection = info.findViewById(R.id.btnDirection);
         Button btnInformation = info.findViewById(R.id.btnInformation);
         btnDirection.setOnClickListener(v -> {
-
             if(!gps.canGetLocation()){
                 gps.showSettingAlert();
             }

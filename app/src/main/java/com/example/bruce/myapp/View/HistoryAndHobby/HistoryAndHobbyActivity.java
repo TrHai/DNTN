@@ -1,5 +1,6 @@
 package com.example.bruce.myapp.View.HistoryAndHobby;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ import com.example.bruce.myapp.Presenter.HistoryAndHobby.PHistoryAndHobby;
 import com.example.bruce.myapp.Presenter.MenuFragment.PMenuFragment;
 import com.example.bruce.myapp.R;
 import com.example.bruce.myapp.View.BigMap.BigMapsActivity;
+import com.example.bruce.myapp.View.Information_And_Comments.InformationAndCommentsActivity;
 import com.example.bruce.myapp.View.Login.LoginActivity;
 import com.example.bruce.myapp.View.MenuFragment.IViewMenuFragment;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,6 +55,10 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     DrawerLayout mDrawerLayout;
 
     RecyclerView recyclerView,recyclerViewRecommended;
+    StringBuilder hashCodeListHistory = new StringBuilder();
+    StringBuilder hashCodeListRecommeded = new StringBuilder();
+    ArrayList<Tourist_Location> listHistory;
+    ArrayList<Tourist_Location> listRecommended;
     HistoryAdapter adapter;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 99;
@@ -155,6 +162,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     private void setUpRecyclerView(RecyclerView recyclerView, HistoryAdapter adapter, ArrayList<Tourist_Location> listHistoryLocation) {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
         adapter = new HistoryAdapter(listHistoryLocation, this);
+        this.adapter = adapter;
         adapter.setClickListenerRecyclerView(this);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -229,13 +237,16 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     @Override
     public ArrayList<Tourist_Location> GetUserHistoryLocation(ArrayList<Tourist_Location> tourist_locations) {
         setUpRecyclerView(recyclerView,adapter,tourist_locations);
+        hashCodeListHistory.append(tourist_locations.hashCode());
+        listHistory = tourist_locations;
         return null;
     }
 
     @Override
     public ArrayList<Tourist_Location> returnRecommendedList(ArrayList<Tourist_Location> tourist_locations) {
         setUpRecyclerView(recyclerViewRecommended,adapter,tourist_locations);
-
+        hashCodeListRecommeded.append(tourist_locations.hashCode());
+        listRecommended = tourist_locations;
         return null;
     }
 
@@ -252,10 +263,42 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         finish();
         startActivity(target);
     }
-
+    private void setUpDialog(Dialog info ,Tourist_Location tl){
+        info = new Dialog(HistoryAndHobbyActivity.this);
+        //info.requestWindowFeature(Window.FEATURE_NO_TITLE); -- bo title cua dialog
+        info.setContentView(R.layout.alertdialog_bigmap);
+        info.setTitle("Choose what you want !");
+        info.show();
+        Button btnDirection = info.findViewById(R.id.btnDirection);
+        Button btnInformation = info.findViewById(R.id.btnInformation);
+        btnDirection.setOnClickListener( v -> {
+            finish();
+            Intent target = new Intent(HistoryAndHobbyActivity.this, BigMapsActivity.class);
+            target.putParcelableArrayListExtra("allLocation",allLocation);
+            target.putExtra("destination",tl.getLatitude() + ", " + tl.getLongtitude());
+            startActivity(target);
+        });
+        btnInformation.setOnClickListener(v->{
+            ArrayList<Tourist_Location> tls = new ArrayList<>();
+            tls.add(tl);
+            finish();
+            Intent target = new Intent(HistoryAndHobbyActivity.this, InformationAndCommentsActivity.class);
+            target.putParcelableArrayListExtra("tourist_location",tls);
+            startActivity(target);
+        });
+    }
     @Override
-    public void onClickItemRecyclerView(View view, int position) {
-        Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show();
+    public void onClickItemRecyclerView(View view, int position, String listId) {
+        if(listId.equals(hashCodeListHistory.toString())){
+            Tourist_Location tl = listHistory.get(position);
+            final Dialog info = new Dialog(HistoryAndHobbyActivity.this);
+            setUpDialog(info,tl);
+        }
+        else{
+            Tourist_Location tl = listRecommended.get(position);
+            final Dialog info = new Dialog(HistoryAndHobbyActivity.this);
+            setUpDialog(info,tl);
+        }
     }
     public void startLoading(Context context){
         progressDialog=new ProgressDialog(context);

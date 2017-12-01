@@ -1,5 +1,7 @@
 package com.example.bruce.myapp.View.HistoryAndHobby;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -60,7 +62,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     //biến lưu lịch sử
     String history = "";
     ArrayList<Tourist_Location> allLocation;
-
+    ProgressDialog progressDialog;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +106,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.mToggle = mToggle;
     }
+
     private void setUpListViewMenu(final ListView listView){
         String[] menuItem = {"My profile",
                 "Map",
@@ -200,15 +203,14 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     public String GetUserHistory(String history) {
         //lấy dữ liệu các địa điểm
         this.history = history;
-        presenterHistoryAndHobby.receivedGetLocationData(getApplicationContext());
+        presenterHistoryAndHobby.receivedGetLocationData( HistoryAndHobbyActivity.this);
         return null;
+
     }
 
     @Override
     public String getUserBehavior(String behavior) {
-
         presenterHistoryAndHobby.receivedRecommendeToUser(behavior,history,allLocation);
-
         return null;
     }
 
@@ -255,6 +257,18 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     public void onClickItemRecyclerView(View view, int position) {
         Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show();
     }
+    public void startLoading(Context context){
+        progressDialog=new ProgressDialog(context);
+        progressDialog.setMessage("Đang tải thông tin.....");
+        progressDialog.show();
+        progressDialog.setCanceledOnTouchOutside(true);
+    }
+    public void dismisLoading(){
+        if(progressDialog.isShowing()){
+            progressDialog.dismiss();
+        }
+    }
+
 }
 
 

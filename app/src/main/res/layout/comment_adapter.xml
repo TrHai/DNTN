@@ -100,19 +100,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right">
-
+                <com.like.LikeButton
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:id="@+id/thumb_button"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:circle_end_color="@android:color/holo_blue_dark"
+                    app:circle_start_color="@android:color/holo_blue_bright"
+                    app:dots_primary_color="@android:color/holo_blue_light"
+                    app:dots_secondary_color="@android:color/holo_blue_dark"
+                    app:icon_size="50dp"
+                    app:like_drawable="@drawable/thumb_on"
+                    app:unlike_drawable="@drawable/thumb_off" />
                 <TextView
-                    android:id="@+id/like"
-                    android:layout_marginRight="5dp"
-                    android:text="Like"
-                    android:textStyle="bold"
-                    android:textColor="#00B0FF"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"/>
-
-                <TextView
-
                     android:id="@+id/likeNumber"
                     android:layout_marginRight="5dp"
                     android:text="69"

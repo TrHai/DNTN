@@ -1,6 +1,7 @@
 package com.example.bruce.myapp.View.HistoryAndHobby;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,10 +43,13 @@ import com.example.bruce.myapp.View.Login.LoginActivity;
 import com.example.bruce.myapp.View.MenuFragment.IViewMenuFragment;
 import com.example.bruce.myapp.View.Team.TeamActivity;
 import com.example.bruce.myapp.View.User.UserProfileActivity;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -79,6 +83,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     //biến lưu lịch sử
     String history = "";
     ArrayList<Tourist_Location> allLocation;
+    ProgressDialog progressDialog;
     UserProfile userProfile;
 
     String[] menuItem = {};
@@ -87,6 +92,8 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     private Button btnOk,btnCancel;
     BroadcastReceiver broadcastReceiver;
 
+    private GeoFire geoFire;
+    private DatabaseReference mDataTeamUser;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +106,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         presenterHistoryAndHobby.receivedEnableGPS(getApplicationContext(), this);
         //lấy dữ thông tin user từ firebase
         presenterHistoryAndHobby.receivedGetUserData(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
 //----------------------------------------------------------------------------------------------------------------------------
         initialize();
         //giao dien profile của ng đăng nhập bằng facebook
@@ -226,6 +234,9 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             }
 
     private void initialize() {
+        mDataTeamUser=FirebaseDatabase.getInstance().getReference("TeamUser");
+        geoFire=new GeoFire(mDataTeamUser.child("Member"));
+
         imgFriendProfilePicture = findViewById(R.id.imgUser);
         txtGreeting = findViewById(R.id.txtDisplayName);
         txtEmail = findViewById(R.id.txtEmail);
@@ -376,7 +387,6 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         info.show();
         Button btnDirection = info.findViewById(R.id.btnDirection);
         Button btnInformation = info.findViewById(R.id.btnInformation);
-
         btnDirection.setOnClickListener( v -> {
             finish();
             Intent target = new Intent(HistoryAndHobbyActivity.this, BigMapsActivity.class);
@@ -384,7 +394,6 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             target.putExtra("destination",tl.getLatitude() + ", " + tl.getLongtitude());
             startActivity(target);
         });
-
         btnInformation.setOnClickListener(v->{
             ArrayList<Tourist_Location> tls = new ArrayList<>();
             tls.add(tl);

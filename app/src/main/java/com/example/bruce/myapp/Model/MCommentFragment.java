@@ -1,5 +1,7 @@
 package com.example.bruce.myapp.Model;
 
+import android.util.Log;
+
 import com.example.bruce.myapp.Data.Comment;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.CommentFragment.ICommentFragment;
@@ -8,6 +10,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -35,21 +38,11 @@ public class MCommentFragment {
                 comment_contructor.commentImages = new ArrayList<>();
                 if(location_ID == comment_contructor.locationID) {
 
-                    for(DataSnapshot commentImage: dataSnapshot.getChildren()) {
-                        for (DataSnapshot child_of_CommentImage : commentImage.getChildren()) {
-                            comment_contructor.commentImages.add(child_of_CommentImage.getValue().toString());
-                        }
-                    }
-                    mData.child("User").addChildEventListener(new ChildEventListener() {
+                    mData.child("Img_Comment").child(dataSnapshot.getKey()).addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            UserProfile constructer_userProfile=dataSnapshot.getValue(UserProfile.class);
-                            if(dataSnapshot.getKey().toString().equals(comment_contructor.userID))
-                            {
-                                comment_contructor.userImage = constructer_userProfile.Image;
-                                comments.add(comment_contructor);
-                                callback.getDataComment(comments);
-                            }
+                            comment_contructor.commentImages.add(dataSnapshot.getValue().toString());
+                            callback.getDataComment(comments);
                         }
 
                         @Override
@@ -64,6 +57,22 @@ public class MCommentFragment {
 
                         @Override
                         public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    mData.child("User").child(comment_contructor.userID).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            UserProfile constructer_userProfile=dataSnapshot.getValue(UserProfile.class);
+                            comment_contructor.userImage=constructer_userProfile.Image;
+                            comments.add(comment_contructor);
+                            callback.getDataComment(comments);
 
                         }
 

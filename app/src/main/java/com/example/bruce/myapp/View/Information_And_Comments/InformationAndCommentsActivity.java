@@ -2,6 +2,7 @@ package com.example.bruce.myapp.View.Information_And_Comments;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -29,12 +30,9 @@ import com.example.bruce.myapp.R;
 import com.example.bruce.myapp.Server;
 import com.example.bruce.myapp.View.Comment_Fragment.Comment_Fragment;
 import com.example.bruce.myapp.View.Information_Fragment.Information_Fragment;
+import com.example.bruce.myapp.View.Write_Comment.Write_Comment_Activity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.hsalf.smilerating.SmileRating;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +62,21 @@ public class InformationAndCommentsActivity extends AppCompatActivity {
         setupViewPager(mViewPage);
         setupTabLayout(tabLayout,mViewPage);
         setDialogRate(btnRate,InformationAndCommentsActivity.this);
+        onClickFabComment();
+    }
+
+    private void onClickFabComment() {
+        fabComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getApplicationContext(),Write_Comment_Activity.class);
+                intent.putParcelableArrayListExtra("tourist_location",tls);
+                startActivity(intent);
+
+
+            }
+        });
     }
 
     private void initialize(){
@@ -139,7 +152,7 @@ public class InformationAndCommentsActivity extends AppCompatActivity {
                             @Override
                             protected Map<String, String> getParams() throws AuthFailureError {
                                 Map<String,String>param=new HashMap<>();
-                                param.put("idUser",FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+                                param.put("idUser", FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
                                 param.put("idLocation",String.valueOf(tls.get(0).getLocation_ID()));
                                 param.put("rate",String.valueOf(costRate));
                                 return super.getParams();

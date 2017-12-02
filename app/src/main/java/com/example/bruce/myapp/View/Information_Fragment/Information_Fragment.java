@@ -42,9 +42,6 @@ public class Information_Fragment extends android.support.v4.app.Fragment implem
         mView =  inflater.inflate(R.layout.fragment_information,container,false);
         initialize(mView);
 
-        //set title cho infor fragment
-        txtBI.setText(tls.get(0).getBasicInfo());
-
         return mView;
     }
 
@@ -60,7 +57,6 @@ public class Information_Fragment extends android.support.v4.app.Fragment implem
     private void initialize(View mView){
 
         listView = mView.findViewById(R.id.infoListView);
-        txtBI = mView.findViewById(R.id.txtBasicInfo);
     }
 
     @Override

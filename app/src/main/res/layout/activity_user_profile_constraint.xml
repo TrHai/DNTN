@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.bruce.myapp.View.User.UserProfile">
+    tools:context="com.example.bruce.myapp.View.User.UserProfileActivity">
 
 
     <android.support.design.widget.AppBarLayout
@@ -30,8 +30,7 @@
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
-                android:background="@drawable/imfmenu">
+                android:background="#1f87ff">
 
 
 

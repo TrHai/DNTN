@@ -57,6 +57,7 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
     public void receivedTeamChecker(String idUser, String[] menuItem, ListView listView){
         modelHistoryAndHobby.handleTeamCheker(idUser,menuItem,listView);
     }
+
     @Override
      public void EnableGPS_API22() {
 
@@ -112,4 +113,5 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
     public void HasNoTeam(String[] menuItem, ListView listView) {
         callbackToView.HasNoTeam(menuItem,listView);
     }
+
 }

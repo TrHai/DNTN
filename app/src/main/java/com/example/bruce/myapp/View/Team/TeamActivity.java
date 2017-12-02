@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Button;
 
 import com.example.bruce.myapp.Adapter.TeamAdapter;
 import com.example.bruce.myapp.Data.UserProfile;
@@ -18,6 +19,7 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam {
     RecyclerView recyclerViewTeam;
     PTeam pTeam=new PTeam(this);
     TeamAdapter teamAdapter;
+    Button btnInvite;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +39,7 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam {
 
     private void initialize() {
         recyclerViewTeam=findViewById(R.id.recyclerViewTeam);
-
-
+        btnInvite = findViewById(R.id.btnInvite);
     }
     @Override
     public void onBackPressed() {

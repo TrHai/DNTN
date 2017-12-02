@@ -18,6 +18,7 @@
         android:id="@+id/edtInvite"
         />
         <Button
+            android:id="@+id/btnInvite"
             android:text="invite"
             android:layout_weight="2"
             android:layout_width="0dp"

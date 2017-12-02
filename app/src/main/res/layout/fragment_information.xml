@@ -14,13 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <TextView
-                android:textColor="#FFCA28"
-                android:layout_marginBottom="15dp"
-                android:id="@+id/txtBasicInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <ListView

@@ -7,14 +7,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +44,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.squareup.picasso.Picasso;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -137,6 +143,33 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
             return;
         }
 
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(BigMapsActivity.this);
+                View parentView =  getLayoutInflater().inflate(R.layout.adapter_bottom_sheet,null);
+                bottomSheetDialog.setContentView(parentView);
+                BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) parentView.getParent());
+                bottomSheetBehavior.setPeekHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,400, getResources().getDisplayMetrics()));
+
+                ImageView img_BtmSheet = parentView.findViewById(R.id.img_BtmSheet);
+                TextView txt_BtmSheet = parentView.findViewById(R.id.txt_BtmSheet);
+                TextView txt_BtmSheet_LocationName = parentView.findViewById(R.id.txt_BtmSheet_LocationName);
+                RatingBar rB_BtmSheet_Star = parentView.findViewById(R.id.rB_BtmSheet_Star);
+                for(Tourist_Location tl : tourist_locations){
+                    if(tl.getLocationName().equals(marker.getTitle()) && tl.getAddress().equals(marker.getSnippet())){
+                        Picasso.with(BigMapsActivity.this).load(tl.getLocationImg()).into(img_BtmSheet);
+                        txt_BtmSheet.setText(tl.getBasicInfo());
+                        txt_BtmSheet_LocationName.setText(tl.getLocationName());
+                        rB_BtmSheet_Star.setRating(tl.getStar());
+                        bottomSheetDialog.show();
+                        break;
+                    }
+                }
+                return false;
+            }
+        });
+
         //Google maps controller
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -196,7 +229,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         final Dialog info = new Dialog(BigMapsActivity.this);
 
         //info.requestWindowFeature(Window.FEATURE_NO_TITLE); -- bo title cua dialog
-        info.setContentView(R.layout.alertdialog_bigmap);
+        info.setContentView(R.layout.dialog_bigmap);
         info.setTitle("Choose what you want !");
         info.show();
         Button btnDirection = info.findViewById(R.id.btnDirection);

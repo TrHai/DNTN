@@ -1,10 +1,12 @@
 package com.example.bruce.myapp.View.HistoryAndHobby;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -33,6 +35,7 @@ import com.example.bruce.myapp.GPSTracker;
 import com.example.bruce.myapp.Presenter.HistoryAndHobby.PHistoryAndHobby;
 import com.example.bruce.myapp.Presenter.MenuFragment.PMenuFragment;
 import com.example.bruce.myapp.R;
+import com.example.bruce.myapp.TeamBroadcastReceiver;
 import com.example.bruce.myapp.View.BigMap.BigMapsActivity;
 import com.example.bruce.myapp.View.Information_And_Comments.InformationAndCommentsActivity;
 import com.example.bruce.myapp.View.Login.LoginActivity;
@@ -41,7 +44,10 @@ import com.example.bruce.myapp.View.Team.TeamActivity;
 import com.example.bruce.myapp.View.User.UserProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -73,13 +79,14 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     //biến lưu lịch sử
     String history = "";
     ArrayList<Tourist_Location> allLocation;
-    ProgressDialog progressDialog;
     UserProfile userProfile;
 
     String[] menuItem = {};
     private Dialog dialogCreateTeam ;
     private TextView txtTeamName;
     private Button btnOk,btnCancel;
+    BroadcastReceiver broadcastReceiver;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +99,6 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         presenterHistoryAndHobby.receivedEnableGPS(getApplicationContext(), this);
         //lấy dữ thông tin user từ firebase
         presenterHistoryAndHobby.receivedGetUserData(FirebaseAuth.getInstance().getCurrentUser().getUid());
-
 //----------------------------------------------------------------------------------------------------------------------------
         initialize();
         //giao dien profile của ng đăng nhập bằng facebook
@@ -102,8 +108,44 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         //set up menu
         setUpListViewMenu(listView);
 
+        checkInternetActivity();
     }
-    private void interfaceFacebookUser(FirebaseUser user,ImageView imgFriendProfilePicture,TextView txtEmail,TextView txtGreeting){
+
+    private void checkInternetActivity(){
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int[] type = {ConnectivityManager.TYPE_WIFI, ConnectivityManager.TYPE_MOBILE};
+                //It's like the first way
+                if(TeamBroadcastReceiver.isNetWorkAvailable(context,type) == true){
+                    FirebaseDatabase.getInstance().getReference("User").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Toast.makeText(context, "Change.....", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                else{
+                    Toast.makeText(HistoryAndHobbyActivity.this, "No internet", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
+    }
+
+    private void interfaceFacebookUser(FirebaseUser user, ImageView imgFriendProfilePicture, TextView txtEmail, TextView txtGreeting){
 
         if (user != null) {
             //neu ko dang nhap bang facebook thi` ...
@@ -329,11 +371,12 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     private void setUpDialog(Dialog info ,Tourist_Location tl){
         info = new Dialog(HistoryAndHobbyActivity.this);
         //info.requestWindowFeature(Window.FEATURE_NO_TITLE); -- bo title cua dialog
-        info.setContentView(R.layout.alertdialog_bigmap);
+        info.setContentView(R.layout.dialog_bigmap);
         info.setTitle("Choose what you want !");
         info.show();
         Button btnDirection = info.findViewById(R.id.btnDirection);
         Button btnInformation = info.findViewById(R.id.btnInformation);
+
         btnDirection.setOnClickListener( v -> {
             finish();
             Intent target = new Intent(HistoryAndHobbyActivity.this, BigMapsActivity.class);
@@ -341,6 +384,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             target.putExtra("destination",tl.getLatitude() + ", " + tl.getLongtitude());
             startActivity(target);
         });
+
         btnInformation.setOnClickListener(v->{
             ArrayList<Tourist_Location> tls = new ArrayList<>();
             tls.add(tl);
@@ -363,18 +407,11 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             setUpDialog(info,tl);
         }
     }
-    public void startLoading(Context context){
-        progressDialog=new ProgressDialog(context);
-        progressDialog.setMessage("Đang tải thông tin.....");
-        progressDialog.show();
-        progressDialog.setCanceledOnTouchOutside(true);
-    }
-    public void dismisLoading(){
-        if(progressDialog.isShowing()){
-            progressDialog.dismiss();
-        }
-    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 }
 
 

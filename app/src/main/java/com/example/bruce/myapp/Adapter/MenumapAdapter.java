@@ -46,7 +46,7 @@ public class MenumapAdapter extends RecyclerView.Adapter<MenumapAdapter.ViewHold
         holder.txtAddress.setText(tourist_location.Address);
         holder.locationName.setText(tourist_location.LocationName);
         holder.ratingBar.setRating(tourist_location.star);
-        Picasso.with(context).load(tourist_location.LocationImg).into(holder.imageView, new Callback() {
+        Picasso.with(context).load(tourist_location.LocationImg).resize(200,200).into(holder.imageView, new Callback() {
             @Override
             public void onSuccess() {
                 holder.progressBar.setVisibility(View.GONE);

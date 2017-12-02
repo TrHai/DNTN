@@ -16,23 +16,37 @@
             android:background="#880E4F"
             >
             <LinearLayout
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FAFAFA"
-                    android:textSize="22dp"
-                    android:text="Title"/>
-                <RatingBar
-                    android:id="@+id/ratingBar_Main"
-                    style="@style/RatingBar"
-                    android:layout_width="wrap_content"
-                    android:rating="3.5"
-                    android:layout_height="wrap_content"
-                    android:progressTint="#FFD600"/>
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_weight="7"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FAFAFA"
+                        android:textSize="22dp"
+                        android:text="Title"/>
+                    <RatingBar
+                        android:id="@+id/ratingBar_Main"
+                        style="@style/RatingBar"
+                        android:layout_width="wrap_content"
+                        android:rating="3.5"
+                        android:layout_height="wrap_content"
+                        android:progressTint="#FFD600"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/btnrated"
+                    android:textColor="@android:color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_weight="3"
+                    android:text="đánh giá"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </android.support.v7.widget.Toolbar>
         <android.support.design.widget.TabLayout

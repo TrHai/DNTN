@@ -10,4 +10,5 @@ public class Server {
     public static String url_MoreInfomation = "http://"+localHost+ "/getchitietdulich.php?iddulich=";
     public static String url_RatingStar = "http://"+localHost+"/getratingstar.php";
     public static String url_SearchName= "http://"+localHost+ "/search.php?name=";
+    public static String url_PostRating="https://"+localHost+"/postRating.php";
 }

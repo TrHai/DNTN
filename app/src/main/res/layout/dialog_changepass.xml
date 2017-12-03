@@ -15,7 +15,7 @@
             <EditText
                 android:id="@+id/edtoldpass"
                 android:paddingLeft="10dp"
-                android:hint="Old password"
+                android:hint="@string/Oldpassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"/>
@@ -23,14 +23,14 @@
                 android:inputType="textPassword"
                 android:id="@+id/edtnewpass"
                 android:paddingLeft="10dp"
-                android:hint="New Password"
+                android:hint="@string/NewPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <EditText
                 android:inputType="textPassword"
                 android:id="@+id/edtconfirmPass"
                 android:paddingLeft="10dp"
-                android:hint="Confirm Password"
+                android:hint="@string/ConfirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <LinearLayout
@@ -40,7 +40,7 @@
                 <Button
                     android:background="#6A5ACD"
                     android:id="@+id/btnsavepass"
-                    android:text="Save"
+                    android:text="@string/Save"
                     android:textColor="@android:color/white"
                     android:layout_weight="1"
                     android:layout_width="0dp"
@@ -49,7 +49,7 @@
                     android:textColor="@android:color/white"
                     android:background="#6A5ACD"
                     android:id="@+id/btncancelpass"
-                    android:text="cancel"
+                    android:text="@string/Cancel"
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />

@@ -22,7 +22,7 @@
                 android:id="@+id/edtComment"
                 android:gravity="top"
                 android:lines="5"
-                android:hint="Enter comment...."
+                android:hint="@string/EnterComment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>

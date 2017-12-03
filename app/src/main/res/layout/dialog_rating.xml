@@ -25,7 +25,7 @@
             <Button
                 android:id="@+id/btnrate"
                 android:background="@android:color/transparent"
-                android:text="rate"
+                android:text="@string/rate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>

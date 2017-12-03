@@ -40,7 +40,8 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.HistoryAndHobby.HistoryAndHobbyActivity" />
+        <activity
+            android:name=".View.HistoryAndHobby.HistoryAndHobbyActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

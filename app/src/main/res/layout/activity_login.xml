@@ -45,7 +45,7 @@
                 android:layout_marginRight="30dp"
                 android:drawableLeft="@drawable/ic_account_white_24dp"
                 android:ems="10"
-                android:hint="Email"
+                android:hint="@string/Email"
                 android:inputType="textEmailAddress"
                 android:selectAllOnFocus="false"
                 android:singleLine="false" />
@@ -66,7 +66,7 @@
                 android:layout_marginRight="30dp"
                 android:layout_marginLeft="30dp"
                 android:ems="10"
-                android:hint="Password"
+                android:hint="@string/Password"
                 android:inputType="textPassword"/>
         </LinearLayout>
         <LinearLayout
@@ -83,7 +83,7 @@
                 <Button
                     android:background="@android:color/transparent"
                     android:id="@+id/Login"
-                    android:text="Login"
+                    android:text="@string/Login"
                     android:textColor="#212121"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -98,7 +98,7 @@
                     android:textColor="#212121"
                     android:background="@android:color/transparent"
                     android:id="@+id/Create"
-                    android:text="Create"
+                    android:text="@string/Create"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" />
             </LinearLayout>

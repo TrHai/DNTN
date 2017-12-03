@@ -44,7 +44,7 @@
                     android:textColor="@android:color/white"
                     android:background="@android:color/transparent"
                     android:layout_weight="3"
-                    android:text="đánh giá"
+                    android:text="@string/Rate"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />
             </LinearLayout>

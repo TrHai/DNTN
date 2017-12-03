@@ -2,13 +2,16 @@ package com.example.bruce.myapp.View.HistoryAndHobby;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,12 +23,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -58,10 +62,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewHistoryAndHobby,IViewMenuFragment,HistoryAdapter.RecyclerViewClicklistener {
 
-
+    private static final String FILE_NAME = "file_lang"; // preference file name
+    private static final String KEY_LANG = "key_lang"; // preference key
     private PHistoryAndHobby presenterHistoryAndHobby = new PHistoryAndHobby(this);
     private PMenuFragment pMenuFragment = new PMenuFragment(this);
 
@@ -106,7 +112,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_and_hobby);
 
-
+        loadLanguage();
 //---------------------------------------------------------------------------------------------------------------------------
         //kiểm tra GPS có bật hay chưa trong Presenter
         presenterHistoryAndHobby.receivedEnableGPS(getApplicationContext(), this);
@@ -247,7 +253,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                 {
                     pMenuFragment.receivedLogout();
                 }
-                if(value == "Map"){
+                if(value == getString(R.string.Map)){
 
                     finish();
                     Intent target = new Intent(HistoryAndHobbyActivity.this, BigMapsActivity.class);
@@ -255,7 +261,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
                     startActivity(target);
                 }
-                if(value == "My profile"){
+                if(value == getString(R.string.MyProfile)){
                     finish();
                     Intent target = new Intent(HistoryAndHobbyActivity.this, UserProfileActivity.class);
                     ArrayList<UserProfile> listUser=new ArrayList<>();
@@ -263,13 +269,13 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                     target.putParcelableArrayListExtra("user",listUser);
                     startActivity(target);
                 }
-                if(value=="Team")
+                if(value==getString(R.string.Team))
                 {
                     finish();
                     Intent target = new Intent(HistoryAndHobbyActivity.this, TeamActivity.class);
                     startActivity(target);
                 }
-                if(value=="Create Team")
+                if(value==getString(R.string.CreateTeam))
                 {
                     dialogCreateTeam = new Dialog(HistoryAndHobbyActivity.this);
                     dialogCreateTeam.setContentView(R.layout.dialog_create_team);
@@ -321,7 +327,81 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         if (mToggle.onOptionsItemSelected(item)) {
             return true;
         }
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.btnchangeLanguage) {
+
+            Dialog dialog=new Dialog(HistoryAndHobbyActivity.this);
+            dialog.setContentView(R.layout.dialog_language);
+            dialog.show();
+            TextView txtVietnamese=dialog.findViewById(R.id.txtVietnamese);
+            TextView txtEnglish=dialog.findViewById(R.id.txtEnglish);
+            ImageButton btnVietnamese=dialog.findViewById(R.id.ImgBtnVietnamese);
+            ImageButton btnEnglish=dialog.findViewById(R.id.ImgbtnEnglish);
+            btnVietnamese.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                        saveLanguage("vi");
+                }
+            });
+            btnEnglish.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    saveLanguage("en");
+                }
+            });
+
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+    private void saveLanguage(String lang) {
+
+
+        // we can use this method to save language
+        SharedPreferences preferences = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(KEY_LANG, lang);
+        editor.apply();
+        // we have saved
+        // recreate activity after saving to load the new language, this is the same
+        // as refreshing activity to load new language
+
+        recreate();
+
+    }
+
+    private void loadLanguage() {
+        // we can use this method to load language,
+        // this method should be called before setContentView() method of the onCreate method
+
+        Locale locale = new Locale(getLangCode());
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+    }
+
+    private String getLangCode() {
+        SharedPreferences preferences = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
+        String langCode = preferences.getString(KEY_LANG, "en");
+        // save english 'en' as the default language
+        return langCode;
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_item, menu);
+        return true;
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+
+        super.onAttachFragment(fragment);
     }
 
     @Override
@@ -405,10 +485,10 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
     @Override
     public void HasTeam(String[] menuItem, ListView listView) {
-        menuItem = new String[]{"My profile",
-                "Map",
-                "Log out",
-                "Team"};
+        menuItem = new String[]{getString(R.string.MyProfile),
+                getString(R.string.Map),
+                getString(R.string.Logout),
+                getString(R.string.Team)};
         ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
                 menuItem);
@@ -417,10 +497,10 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
     @Override
     public void HasNoTeam(String[] menuItem, ListView listView) {
-        menuItem = new String[]{"My profile",
-                "Map",
-                "Log out",
-                "Create Team"};
+        menuItem = new String[]{getString(R.string.MyProfile),
+                getString(R.string.Map),
+                getString(R.string.Logout),
+                getString(R.string.CreateTeam)};
         ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
                 menuItem);
@@ -482,6 +562,8 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     protected void onResume() {
         super.onResume();
     }
+
+
 }
 
 

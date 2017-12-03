@@ -111,14 +111,14 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     private DatabaseReference mDataTeamUser;
     AlertDialog.Builder builder;
     AlertDialog alertDialog;
-
+    String Language;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_and_hobby);
 
-        loadLanguage();
+        //loadLanguage();
         //load data dialog
         loadDaTaDialog=new SpotsDialog(this);
         loadDaTaDialog.show();
@@ -169,6 +169,13 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
             }
         });
+        Language = Locale.getDefault().getDisplayLanguage().toString(); // lấy ngôn ngữ mặc định
+        if(Language.equals("English")){
+            Toast.makeText(this, "English", Toast.LENGTH_SHORT).show();
+        }else if(Language.equals("Tiếng Việt")){
+            Toast.makeText(this, "Tiếng việt", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void diaLogInvite() {
@@ -352,7 +359,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.btnchangeLanguage) {
-
+            // Hiện thông báo dialog chuyển đổi ngôn ngữ
             Dialog dialog=new Dialog(HistoryAndHobbyActivity.this);
             dialog.setContentView(R.layout.dialog_language);
             dialog.setCanceledOnTouchOutside(true);
@@ -364,15 +371,28 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             btnVietnamese.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                        saveLanguage("vi");
-                        dialog.dismiss();
+
+                    Locale locale=new Locale("vi");
+                    Locale.setDefault(locale);
+                    Configuration config = new Configuration();
+                    config.locale = locale;
+                    getBaseContext().getResources().updateConfiguration(config,
+                            getBaseContext().getResources().getDisplayMetrics());
+                    startActivity(getIntent());
+
                 }
             });
             btnEnglish.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    saveLanguage("en");
-                    dialog.dismiss();
+
+                    Locale locale=new Locale("en");
+                    Locale.setDefault(locale);
+                    Configuration config = new Configuration();
+                    config.locale = locale;
+                    getBaseContext().getResources().updateConfiguration(config,
+                            getBaseContext().getResources().getDisplayMetrics());
+                    startActivity(getIntent());
                 }
             });
 
@@ -383,41 +403,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         }
         return super.onOptionsItemSelected(item);
     }
-    private void saveLanguage(String lang) {
 
-
-        // we can use this method to save language
-        SharedPreferences preferences = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(KEY_LANG, lang);
-        editor.apply();
-        // we have saved
-        // recreate activity after saving to load the new language, this is the same
-        // as refreshing activity to load new language
-
-        recreate();
-
-    }
-
-    private void loadLanguage() {
-        // we can use this method to load language,
-        // this method should be called before setContentView() method of the onCreate method
-
-        Locale locale = new Locale(getLangCode());
-        Locale.setDefault(locale);
-
-
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-    }
-
-    private String getLangCode() {
-        SharedPreferences preferences = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
-        String langCode = preferences.getString(KEY_LANG, "en");
-        // save english 'en' as the default language
-        return langCode;
-    }
 
 
     @Override

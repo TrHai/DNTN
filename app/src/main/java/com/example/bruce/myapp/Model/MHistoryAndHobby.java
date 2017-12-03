@@ -1,7 +1,6 @@
 package com.example.bruce.myapp.Model;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -40,21 +39,9 @@ import java.util.Set;
 public class MHistoryAndHobby {
 
     IHistoryAndHobby callback;
-    static ProgressDialog progressDialog;
     public MHistoryAndHobby() {
     }
-    public void startLoading(Context context){
-        progressDialog=new ProgressDialog(context);
-        progressDialog.setMessage("Đang tải thông tin.....");
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
 
-    }
-    public void dismisLoading(){
-        if(progressDialog.isShowing()){
-            progressDialog.dismiss();
-        }
-    }
 
     public MHistoryAndHobby(IHistoryAndHobby callback) {
         this.callback = callback;

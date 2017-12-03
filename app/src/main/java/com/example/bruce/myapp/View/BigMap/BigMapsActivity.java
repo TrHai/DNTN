@@ -1,22 +1,12 @@
 package com.example.bruce.myapp.View.BigMap;
 
 import android.Manifest;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.ActivityCompat;
@@ -24,10 +14,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,7 +25,6 @@ import android.widget.Toast;
 
 import com.example.bruce.myapp.Adapter.MenumapAdapter;
 import com.example.bruce.myapp.Data.Tourist_Location;
-import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Direction.DirectionFinder;
 import com.example.bruce.myapp.Direction.DirectionFinderListener;
 import com.example.bruce.myapp.Direction.Route;
@@ -47,37 +34,22 @@ import com.example.bruce.myapp.Presenter.BigMap.PBigMap;
 import com.example.bruce.myapp.R;
 import com.example.bruce.myapp.View.HistoryAndHobby.HistoryAndHobbyActivity;
 import com.example.bruce.myapp.View.Information_And_Comments.InformationAndCommentsActivity;
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryEventListener;
-import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnMapReadyCallback,DirectionFinderListener,MenumapAdapter.RecyclerViewClicklistener {
 
@@ -106,12 +78,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
     private List<Marker> destinationMarkers;
     private List<Polyline> polylinePaths;
     private ProgressDialog progressDialog;
-   private List<Circle> circle=new ArrayList<>();
-    List<Marker> locationUser=new ArrayList<>();
-
-
-    boolean area=true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,8 +130,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mLocation, 14));
                 count = true;
             }
-            showTeamUser(location.getLatitude(),location.getLongitude());
-
         });
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -179,6 +143,44 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
             return;
         }
 
+        //Google maps controller
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+
+        gps = new GPSTracker(this);
+        mLocation= new LatLng(gps.getLatitude(),gps.getLongtitude());
+        origin = mLocation.latitude+", "+mLocation.longitude;
+        markAllLocation(tourist_locations,mMap,recyclerView_ListLocation,adapter,mLocation);
+
+        //tìm đường của địa điểm truyền từ HistoryAndHobby
+        findDirectionFromHistoryAndHobby(origin);
+        //set up bottmo sheet
+        setupBottomSheet(mMap,tourist_locations);
+    }
+
+    private void markAllLocation(ArrayList<Tourist_Location> tourist_locations,GoogleMap mMap,RecyclerView recyclerView_ListLocation, MenumapAdapter adapter, LatLng mLocation)
+    {
+
+        for(Tourist_Location tl : tourist_locations){
+
+            final  LatLng latLgData = new LatLng(tl.Latitude,tl.Longtitude);
+            tl.setDistance(modelBigMap.Radius(mLocation,latLgData));
+            mMap.addMarker(new MarkerOptions().position(latLgData).title(tl.LocationName).snippet(tl.Address).icon(null));
+        }
+        //sắp xếp lại array
+        Collections.sort(tourist_locations);
+        //set up cho recyclerView
+        setUpRecyclerView(recyclerView_ListLocation,adapter,tourist_locations);
+    }
+
+    private void findDirectionFromHistoryAndHobby(String origin){
+        if(getIntent().getStringExtra("destination") != null){
+            sendRequest(origin,getIntent().getStringExtra("destination"));
+        }
+    }
+
+    private void setupBottomSheet(GoogleMap mMap, ArrayList<Tourist_Location> tourist_locations){
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -205,234 +207,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                 return false;
             }
         });
-
-        //Google maps controller
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
-
-        gps = new GPSTracker(this);
-        mLocation= new LatLng(gps.getLatitude(),gps.getLongtitude());
-        origin = mLocation.latitude+", "+mLocation.longitude;
-        markAllLocation(tourist_locations,mMap,recyclerView_ListLocation,adapter,mLocation);
-
-        if(getIntent().getStringExtra("destination") != null){
-            sendRequest(origin,getIntent().getStringExtra("destination"));
-        }
-    }
-
-    private void showTeamUser(double lat,double log) {
-        {
-            final View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-            DatabaseReference mDataTeamUser= FirebaseDatabase.getInstance().getReference("TeamUser");
-            DatabaseReference mDataCheckTeam=FirebaseDatabase.getInstance().getReference("CheckTeam");
-            mDataCheckTeam.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
-                    {
-                        String idCaptain= dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Captain").getValue().toString();
-                        GeoFire geoFire=new GeoFire(mDataTeamUser.child(idCaptain).child("member"));
-                        //Đấy latLog của Thành viên trong team lên firebase
-                        mDataTeamUser.child(idCaptain).child("member").addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                                for (Marker maker :locationUser)
-                                    maker.remove();
-                                geoFire.getLocation(String.valueOf(dataSnapshot.getKey()), new LocationCallback() {
-                                    @Override
-                                    public void onLocationResult(String key, final GeoLocation location) {
-                                        if (location != null)
-                                        {
-                                            final ImageView makerImg= (ImageView) marker.findViewById(R.id.markerimg);
-                                            //tạo marker trừ mình ra
-                                            if(dataSnapshot.getKey().toString()!=FirebaseAuth.getInstance().getCurrentUser().getUid()) {
-                                                //Lấy hình user
-                                                FirebaseDatabase.getInstance().getReference("User").child(key).addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        UserProfile constructer_userProfile=dataSnapshot.getValue(UserProfile.class);
-                                                        Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
-                                                        locationUser.add(mMap.addMarker(new MarkerOptions()
-                                                                .title("Friend")
-                                                                .position(new LatLng(location.latitude, location.longitude))
-                                                                .flat(true)
-                                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                                                                .anchor(0.5f, 1)));
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-
-                                                    }
-                                                });
-
-
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(), new GeoLocation(lat, log));
-                        circleCaptain(geoFire,idCaptain);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-        }
-    }
-
-    private void circleCaptain(GeoFire geoFire, String idCaptain) {
-
-        geoFire.getLocation(idCaptain, new LocationCallback() {
-            @Override
-            public void onLocationResult(String key, GeoLocation location) {
-                if (location != null) {
-                    if(circle!=null)
-                    {
-                        for (Circle cirlcee:circle)
-                        {
-                            cirlcee.remove();
-                        }
-                    }
-                    circle.add( mMap.addCircle(new CircleOptions()
-                            .center(new LatLng(location.latitude,location.longitude))
-                            .radius(500) //tinh theo met'
-                            .strokeColor(Color.RED)
-                            .fillColor(0x220000FF)));
-                    GeoQuery geoQuery;
-                    geoQuery=geoFire.queryAtLocation(new GeoLocation(location.latitude,location.longitude),0.5f);
-                    geoQuery.removeAllListeners();
-                    geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-                        @Override
-                        public void onKeyEntered(String key, final GeoLocation location) {
-
-                            if (FirebaseAuth.getInstance().getCurrentUser().getUid() == key) {
-                                if (area == true) {
-                                    sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Vào Khu Vực Của Team");
-                                    area=false;
-                                }
-                            }
-                        }
-                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-                        @Override
-                        public void onKeyExited(String key) {
-                            if (FirebaseAuth.getInstance().getCurrentUser().getUid() == key) {
-                                if (area == false) {
-                                    sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Đi Khỏi Khu Vực Team");
-                                    area=true;
-                                }
-                            }
-                        }
-                        @Override
-                        public void onKeyMoved(String key, GeoLocation location) {
-                        }
-
-                        @Override
-                        public void onGeoQueryReady() {
-
-                        }
-
-                        @Override
-                        public void onGeoQueryError(DatabaseError error) {
-
-                        }
-                    });
-                } else {
-                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.err.println("There was an error getting the GeoFire location: " + databaseError);
-
-            }
-
-
-        });
-    }
-
-    private void sendNotification(String title, String content) {
-        Notification.Builder builder=new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setContentTitle(title)
-                .setContentText(content);
-        NotificationManager manager= (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent intent=new Intent(this,BigMapsActivity.class);
-        PendingIntent contentIntent=PendingIntent.getActivity(this,0, intent, PendingIntent.FLAG_IMMUTABLE);
-        builder.setContentIntent(contentIntent);
-        Notification notification = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            notification = builder.build();
-        }
-        notification.flags |=Notification.FLAG_AUTO_CANCEL;
-        notification.defaults|=Notification.DEFAULT_SOUND;
-        manager.notify(new Random().nextInt(),notification);
-    }
-
-    public static Bitmap createDrawableFromView(Context context, View view) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        view.setLayoutParams(new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
-        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.buildDrawingCache();
-        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-
-        return bitmap;
-    }
-
-    private void markAllLocation(ArrayList<Tourist_Location> tourist_locations,GoogleMap mMap,RecyclerView recyclerView_ListLocation, MenumapAdapter adapter, LatLng mLocation){
-
-        for(Tourist_Location tl : tourist_locations){
-
-            final  LatLng latLgData = new LatLng(tl.Latitude,tl.Longtitude);
-            tl.setDistance(modelBigMap.Radius(mLocation,latLgData));
-            mMap.addMarker(new MarkerOptions().position(latLgData).title(tl.LocationName).snippet(tl.Address).icon(null));
-        }
-        //sắp xếp lại array
-        Collections.sort(tourist_locations);
-        //set up cho recyclerView
-        setUpRecyclerView(recyclerView_ListLocation,adapter,tourist_locations);
     }
 
     private void setUpRecyclerView(RecyclerView recyclerView, MenumapAdapter adapter, ArrayList<Tourist_Location> tourist_locations) {
@@ -489,7 +263,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
             info.dismiss();
             //lưu lại lịch sử xem của user
             pBigMap.receivedSaveHistoryAndBehavior(tl.location_ID,tl.getKindOfLocation(), FirebaseAuth.getInstance().getCurrentUser().getUid());
-
             ArrayList<Tourist_Location> tls = new ArrayList<>();
             tls.add(tl);
             Intent infor = new Intent(this, InformationAndCommentsActivity.class);

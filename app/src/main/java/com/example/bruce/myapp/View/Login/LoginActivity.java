@@ -2,12 +2,9 @@ package com.example.bruce.myapp.View.Login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +14,7 @@ import android.widget.Toast;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.Login.PLogin;
 import com.example.bruce.myapp.R;
+import com.example.bruce.myapp.SetupToasty;
 import com.example.bruce.myapp.View.HistoryAndHobby.HistoryAndHobbyActivity;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -32,7 +30,8 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.Arrays;
-import java.util.Locale;
+
+import es.dmoral.toasty.Toasty;
 
 
 public class LoginActivity extends AppCompatActivity implements IViewLogin,GoogleApiClient.OnConnectionFailedListener {
@@ -50,6 +49,7 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
 
     UserProfile userProfile;
     ProgressDialog progressDialoglogin;
+    SetupToasty toasty = new SetupToasty(this);
     //MVP
     PLogin presenterLogin;
 
@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
     //đăng nhập bằng tài khoản firebase
     @Override
     public void LoginSuccess() {
-        Toast.makeText(this, "Login "+ userProfile.Email, Toast.LENGTH_SHORT).show();
+        Toasty.success(this,"Login successed",Toast.LENGTH_SHORT);
         if(progressDialoglogin.isShowing()){
             progressDialoglogin.dismiss();
         }
@@ -171,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         if(progressDialoglogin.isShowing()){
             progressDialoglogin.dismiss();
         }
-        Toast.makeText(this, "Wrong email or password. Please retype", Toast.LENGTH_SHORT).show();
+        Toasty.error(this,"Wrong email or password. Please retype", Toast.LENGTH_SHORT).show();
         edtPass.setText(null);
     }
 
@@ -181,8 +181,7 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         if(progressDialoglogin.isShowing()){
             progressDialoglogin.dismiss();
         }
-
-        Toast.makeText(this, "Please insert your email !!!", Toast.LENGTH_SHORT).show();
+        Toasty.warning(this,"Please insert your email !!!",Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -190,7 +189,7 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         if(progressDialoglogin.isShowing()){
             progressDialoglogin.dismiss();
         }
-        Toast.makeText(this, "Please insert your password !!!", Toast.LENGTH_SHORT).show();
+        Toasty.warning(this,"Please insert your password !!!",Toast.LENGTH_SHORT).show();
     }
 
     //lấy thông tin user truyền ra UI
@@ -207,6 +206,7 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         finish();
         Intent target = new Intent(LoginActivity.this, HistoryAndHobbyActivity.class);
         target.putExtra("hobby",userProfile.Hobbie);
+        Toasty.success(this,"Login facebook successed",Toast.LENGTH_SHORT);
         startActivity(target);
 
     }
@@ -214,14 +214,14 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
     @Override
     public void LoginFacebookFailed() {
 
-        Toast.makeText(this, "Login facebook failed", Toast.LENGTH_SHORT).show();
+        Toasty.error(this,"Login facebook failed", Toast.LENGTH_SHORT).show();
 
     }
 
     //xử lý đăng nhập bằng google
     @Override
     public void LoginGoogleSuccess() {
-        Toast.makeText(this, userProfile.Name + "", Toast.LENGTH_SHORT).show();
+        Toasty.success(this,"Login google successed",Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -236,7 +236,5 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
-
 }
 

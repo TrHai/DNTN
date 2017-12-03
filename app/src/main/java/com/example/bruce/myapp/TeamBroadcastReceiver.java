@@ -15,11 +15,12 @@ public class TeamBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         int[] type = {ConnectivityManager.TYPE_MOBILE, ConnectivityManager.TYPE_WIFI};
-        if(isNetWorkAvailable(context,type) == false){
-
+        Toast.makeText(context, "Location change", Toast.LENGTH_SHORT).show();
+        if(isNetWorkAvailable(context,type) == true){
+            Toast.makeText(context, "No sdasdasdInternet !!!", Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(context, "No Internet !!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "No Internet 123123123!!!", Toast.LENGTH_SHORT).show();
         }
     }
 

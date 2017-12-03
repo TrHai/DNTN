@@ -66,6 +66,7 @@ public class MiniMapsFragment extends Fragment implements OnMapReadyCallback {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(MyLocation, 14));
                     count = !count;
                 }
+
             }
         });
 

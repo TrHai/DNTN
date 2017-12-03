@@ -16,6 +16,7 @@ import com.example.bruce.myapp.Presenter.Login.PLogin;
 import com.example.bruce.myapp.R;
 import com.example.bruce.myapp.SetupToasty;
 import com.example.bruce.myapp.View.HistoryAndHobby.HistoryAndHobbyActivity;
+import com.example.bruce.myapp.View.Register.RegisterActivity;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -35,7 +36,6 @@ import es.dmoral.toasty.Toasty;
 
 
 public class LoginActivity extends AppCompatActivity implements IViewLogin,GoogleApiClient.OnConnectionFailedListener {
-
     ImageView imgLogo;
     LoginButton btnLoginFB;
     CallbackManager callbackManager;
@@ -65,6 +65,17 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         loginWithFB();
         loginWithGG();
         HandleLoginEvent(btnLogin);
+        CreateAccount();
+    }
+
+    private void CreateAccount() {
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent target = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(target);
+            }
+        });
     }
 
     private void initialize(){

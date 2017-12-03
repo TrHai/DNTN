@@ -33,7 +33,6 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
     Button btnInvite;
     EditText edtInvite;
     ArrayList<UserProfile> listUser;
-    String idUserClick;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,19 +55,18 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
                     if(userProfile.Email.equals(EmailInvited))
                     {
                         String IdUser=dataSnapshot.getKey();
-                        FirebaseDatabase.getInstance().getReference("CheckTeam").addValueEventListener(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference("CheckTeam").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.child(IdUser).exists()) {
-                                        Toast.makeText(TeamActivity.this, EmailInvited + "đã có nhóm rồi", Toast.LENGTH_SHORT).show();
-                                    } else  if (dataSnapshot.child(IdUser).exists()==false) {
-                                        Log.d("ffff","wqeqwe");
-                                        FirebaseDatabase.getInstance().getReference("ListInviting").child(IdUser).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                                        Toast.makeText(TeamActivity.this, "Đã gởi lời mời đến " + EmailInvited, Toast.LENGTH_SHORT).show();
-                                        edtInvite.setText("");
+                                if (dataSnapshot.child(IdUser).exists()) {
+                                    Toast.makeText(TeamActivity.this, EmailInvited + "đã có nhóm rồi", Toast.LENGTH_SHORT).show();
+                                } else  if (dataSnapshot.child(IdUser).exists()==false) {
+                                    Log.d("ffff","wqeqwe");
+                                    FirebaseDatabase.getInstance().getReference("ListInviting").child(IdUser).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                    Toast.makeText(TeamActivity.this, "Đã gởi lời mời đến " + EmailInvited, Toast.LENGTH_SHORT).show();
+                                    edtInvite.setText("");
 
-                                    }
-
+                                }
                             }
 
                             @Override
@@ -126,39 +124,14 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
         FirebaseDatabase.getInstance().getReference("User").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(dataSnapshot.child("Email").getValue().toString().equals(listUser.get(position).Email))
+                if(dataSnapshot.child("Email").getValue().toString().equals(userProfile.Email))
                 {
-                 idUserClick=dataSnapshot.getKey();
+                    listUser.remove(position);
+                    teamAdapter.notifyDataSetChanged();
                     FirebaseDatabase.getInstance().getReference("TeamUser").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("member")
-                    .child(dataSnapshot.getKey()).removeValue();
+                            .child(dataSnapshot.getKey()).removeValue();
                     FirebaseDatabase.getInstance().getReference("CheckTeam").child(dataSnapshot.getKey()).removeValue();
-                    FirebaseDatabase.getInstance().getReference("TeamUser").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("member")
-                            .addChildEventListener(new ChildEventListener() {
-                                @Override
-                                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                                }
-
-                                @Override
-                                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                                }
-
-                                @Override
-                                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                                }
-
-                                @Override
-                                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
                 }
             }
 

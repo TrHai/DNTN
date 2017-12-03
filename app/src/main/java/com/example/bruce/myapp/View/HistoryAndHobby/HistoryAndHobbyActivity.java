@@ -138,7 +138,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         setUpListViewMenu(listView);
 
         checkInternetActivity();
-        FirebaseDatabase.getInstance().getReference("ListInviting").addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("ListInviting").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
@@ -305,7 +305,9 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                         String TeamName=txtTeamName.getText().toString();
                         FirebaseDatabase.getInstance().getReference("CheckTeam").child(user.getUid()).child("Captain").setValue(user.getUid());
                         FirebaseDatabase.getInstance().getReference("TeamUser").child(user.getUid()).child("TeamName").setValue(TeamName);
-                        FirebaseDatabase.getInstance().getReference("TeamUser").child(user.getUid()).child("Member").setValue(user.getUid());
+                        mDataTeamUser=FirebaseDatabase.getInstance().getReference("TeamUser");
+                        geoFire=new GeoFire(mDataTeamUser.child(user.getUid()).child("member"));
+                        geoFire.setLocation(user.getUid(),new GeoLocation(0,0));
                         dialogCreateTeam.dismiss();
                     });
                     dialogCreateTeam.show();

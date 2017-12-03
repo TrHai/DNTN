@@ -9,5 +9,4 @@ import java.util.ArrayList;
  */
 
 public interface IViewComment_Fragment {
-    ArrayList<Comment> getDataComment(ArrayList<Comment> comments);
 }

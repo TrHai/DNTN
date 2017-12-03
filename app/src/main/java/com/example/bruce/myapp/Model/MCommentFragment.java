@@ -2,6 +2,7 @@ package com.example.bruce.myapp.Model;
 
 import android.util.Log;
 
+import com.example.bruce.myapp.Adapter.Comment_Adapter;
 import com.example.bruce.myapp.Data.Comment;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.CommentFragment.ICommentFragment;
@@ -27,8 +28,7 @@ public class MCommentFragment {
         this.callback = callback;
     }
 
-    public void handleGetDataComment(int location_ID){
-        ArrayList<Comment> comments = new ArrayList<>();
+    public void handleGetDataComment(int location_ID, Comment_Adapter adapter,ArrayList<Comment> comments){
 
         mData = FirebaseDatabase.getInstance().getReference();
         mData.child("Comments").addChildEventListener(new ChildEventListener() {
@@ -42,7 +42,7 @@ public class MCommentFragment {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             comment_contructor.commentImages.add(dataSnapshot.getValue().toString());
-                            callback.getDataComment(comments);
+                            adapter.notifyDataSetChanged();
                         }
 
                         @Override
@@ -72,8 +72,7 @@ public class MCommentFragment {
                             UserProfile constructer_userProfile=dataSnapshot.getValue(UserProfile.class);
                             comment_contructor.userImage=constructer_userProfile.Image;
                             comments.add(comment_contructor);
-                            callback.getDataComment(comments);
-
+                            adapter.notifyDataSetChanged();
                         }
 
                         @Override

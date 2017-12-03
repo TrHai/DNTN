@@ -9,5 +9,4 @@ import java.util.ArrayList;
  */
 
 public interface IViewTeam {
-    ArrayList<UserProfile> GetListUser(ArrayList<UserProfile> tourist_locations);
 }

@@ -219,7 +219,6 @@ public class Comment_Adapter extends RecyclerView.Adapter<Comment_Adapter.ViewHo
     @Override
     public void itemClickCommentImage(View view, int position) {
         Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
-
     }
 
 

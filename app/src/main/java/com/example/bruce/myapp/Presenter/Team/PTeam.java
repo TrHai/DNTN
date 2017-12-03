@@ -1,5 +1,6 @@
 package com.example.bruce.myapp.Presenter.Team;
 
+import com.example.bruce.myapp.Adapter.TeamAdapter;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Model.MTeam;
 import com.example.bruce.myapp.View.Team.IViewTeam;
@@ -19,12 +20,9 @@ public class PTeam implements ITeam{
         this.callbackToView = callbackToView;
     }
 
-    public void receivedAddListUser(){
-        mTeam.handleAddListUser();
+    public void receivedAddListUser(TeamAdapter adapter,ArrayList<UserProfile> listUser){
+        mTeam.handleAddListUser(adapter,listUser);
     }
 
-    @Override
-    public ArrayList<UserProfile> GetListUser(ArrayList<UserProfile> listUser) {
-        return callbackToView.GetListUser(listUser);
-    }
+
 }

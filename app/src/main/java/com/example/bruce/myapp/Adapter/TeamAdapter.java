@@ -19,10 +19,10 @@ import java.util.ArrayList;
  * Created by Admin on 29/11/2017.
  */
 
-public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.ViewHolder> {
+public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.ViewHolder>  {
     ArrayList<UserProfile> listUser=new ArrayList<>();
     Context context;
-
+    RecyclerViewClicklistener itemClickListener;
     public TeamAdapter(ArrayList<UserProfile> listUser, Context context) {
         this.listUser = listUser;
         this.context = context;
@@ -54,16 +54,30 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.ViewHolder> {
         return listUser.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView imgTeamUser;
         TextView txtTeamNameUser,txtTeamEmailUser,txtTeamPhoneUser,txtTeamGendre;
         public ViewHolder(View itemView) {
             super(itemView);
             imgTeamUser=itemView.findViewById(R.id.imgTeamUser);
+            imgTeamUser.setOnClickListener(this);
             txtTeamNameUser=itemView.findViewById(R.id.txtTeamNameUser);
             txtTeamEmailUser=itemView.findViewById(R.id.txtTeamEmailUser);
             txtTeamPhoneUser=itemView.findViewById(R.id.txtTeamPhoneUser);
             txtTeamGendre=itemView.findViewById(R.id.txtTeamGendre);
         }
+
+        @Override
+        public void onClick(View v) {
+            if(itemClickListener != null){
+                itemClickListener.itemClickMember(v,getPosition());
+            }
+        }
+    }
+    public void setClickListener(RecyclerViewClicklistener itemClickListener){
+        this.itemClickListener = itemClickListener;
+    }
+    public interface RecyclerViewClicklistener {
+         void itemClickMember(View view, int position);
     }
 }

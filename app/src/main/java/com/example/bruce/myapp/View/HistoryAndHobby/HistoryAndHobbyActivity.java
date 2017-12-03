@@ -1,9 +1,11 @@
 package com.example.bruce.myapp.View.HistoryAndHobby;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -18,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -93,7 +96,10 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     BroadcastReceiver broadcastReceiver;
 
     private GeoFire geoFire;
+    String idCaptain,emailCaptain,idUser;
     private DatabaseReference mDataTeamUser;
+    AlertDialog.Builder builder;
+    AlertDialog alertDialog;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +123,62 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         setUpListViewMenu(listView);
 
         checkInternetActivity();
+        FirebaseDatabase.getInstance().getReference("ListInviting").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
+                {
+                    //dataSnapshot.getKey()=idUser
+                    //dataSnapshot.getKey()=id Đội Trưởng
+                    idUser=dataSnapshot.getKey();
+                    idCaptain =dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getValue().toString();
+
+                    FirebaseDatabase.getInstance().getReference("User").child(idCaptain).child("Email").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            emailCaptain=dataSnapshot.getValue().toString();
+                            diaLogInvite();
+                            alertDialog.show();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                                    }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void diaLogInvite() {
+        builder=new AlertDialog.Builder(this);
+        builder.setMessage(emailCaptain+ " mời bạn vào nhóm").setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        mDataTeamUser=FirebaseDatabase.getInstance().getReference("TeamUser");
+                        geoFire=new GeoFire(mDataTeamUser.child(idCaptain).child("member"));
+                        FirebaseDatabase.getInstance().getReference("CheckTeam").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Captain").setValue(idCaptain);
+                        Toast.makeText(HistoryAndHobbyActivity.this, "Chúc mừng bạn đã gia nhập đội của :"+emailCaptain, Toast.LENGTH_SHORT).show();
+                        FirebaseDatabase.getInstance().getReference("ListInviting").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
+                        geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),new GeoLocation(0,0));
+                    }
+                })
+                .setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog=builder.create();
+        alertDialog.setTitle("Thông báo");
     }
 
     private void checkInternetActivity(){
@@ -234,8 +296,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             }
 
     private void initialize() {
-        mDataTeamUser=FirebaseDatabase.getInstance().getReference("TeamUser");
-        geoFire=new GeoFire(mDataTeamUser.child("Member"));
+
 
         imgFriendProfilePicture = findViewById(R.id.imgUser);
         txtGreeting = findViewById(R.id.txtDisplayName);

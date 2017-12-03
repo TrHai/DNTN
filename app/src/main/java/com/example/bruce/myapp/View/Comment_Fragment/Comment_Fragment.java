@@ -25,7 +25,7 @@ public class Comment_Fragment extends android.support.v4.app.Fragment implements
 
     RecyclerView recyclerView_Comment;
     Comment_Adapter adaper;
-
+    ArrayList<Comment> comments = new ArrayList<>();
     int location_ID;
     PCommentFragment pCommentFragment = new PCommentFragment(this);
     ArrayList<Tourist_Location> tls;
@@ -34,6 +34,11 @@ public class Comment_Fragment extends android.support.v4.app.Fragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mView = (ViewGroup) inflater.inflate(R.layout.comment_fragment,container,false);
         recyclerView_Comment = mView.findViewById(R.id.recyclerView_Comment);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        adaper = new Comment_Adapter(comments,getActivity());
+        recyclerView_Comment.setLayoutManager(layoutManager);
+        recyclerView_Comment.setAdapter(adaper);
+        pCommentFragment.receivedGetDataComment(location_ID,adaper,comments);
         return mView;
     }
 
@@ -44,21 +49,12 @@ public class Comment_Fragment extends android.support.v4.app.Fragment implements
         //lấy dữ liệu từ intent
         tls = getActivity().getIntent().getParcelableArrayListExtra("tourist_location");
         location_ID = tls.get(0).getLocation_ID();
-        pCommentFragment.receivedGetDataComment(location_ID);
 
     }
 
     private void setUpRecyclerView(Comment_Adapter adaper,RecyclerView recyclerView_Comment,ArrayList<Comment> comments){
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        adaper = new Comment_Adapter(comments,getActivity());
-        recyclerView_Comment.setLayoutManager(layoutManager);
-        recyclerView_Comment.setAdapter(adaper);
-        adaper.notifyDataSetChanged();
+
     }
 
-    @Override
-    public ArrayList<Comment> getDataComment(ArrayList<Comment> comments) {
-        setUpRecyclerView(adaper,recyclerView_Comment,comments);
-        return null;
-    }
+
 }

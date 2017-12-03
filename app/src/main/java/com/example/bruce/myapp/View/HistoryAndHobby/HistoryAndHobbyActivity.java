@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,6 +66,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import dmax.dialog.SpotsDialog;
+
 public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewHistoryAndHobby,IViewMenuFragment,HistoryAdapter.RecyclerViewClicklistener {
 
     private static final String FILE_NAME = "file_lang"; // preference file name
@@ -100,12 +104,14 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     private TextView txtTeamName;
     private Button btnOk,btnCancel;
     BroadcastReceiver broadcastReceiver;
+    SpotsDialog loadDaTaDialog;
 
     private GeoFire geoFire;
     String idCaptain,emailCaptain,idUser;
     private DatabaseReference mDataTeamUser;
     AlertDialog.Builder builder;
     AlertDialog alertDialog;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +119,9 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         setContentView(R.layout.activity_history_and_hobby);
 
         loadLanguage();
+        //load data dialog
+        loadDaTaDialog=new SpotsDialog(this);
+        loadDaTaDialog.show();
 //---------------------------------------------------------------------------------------------------------------------------
         //kiểm tra GPS có bật hay chưa trong Presenter
         presenterHistoryAndHobby.receivedEnableGPS(getApplicationContext(), this);
@@ -152,7 +161,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
                         }
                     });
-                                    }
+                }
             }
 
             @Override
@@ -187,6 +196,25 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         alertDialog.setTitle("Thông báo");
     }
 
+    Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            for(int i = 0 ; i < 2 ; i++){
+                try {
+                    Thread.sleep(3000);
+                    Location myLocation = gps.getLocation();
+                    FirebaseDatabase.getInstance().getReference("User").child(user.getUid().toString()).child("Lat").setValue(myLocation.getLatitude());
+                    FirebaseDatabase.getInstance().getReference("User").child(user.getUid().toString()).child("Log").setValue(myLocation.getLongitude());
+                    Log.i("asd",gps.getLatitude()+"");
+                    if(i == 1){i=0;}
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Loi thread", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    });
+
     private void checkInternetActivity(){
         IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         broadcastReceiver = new BroadcastReceiver() {
@@ -195,23 +223,14 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                 int[] type = {ConnectivityManager.TYPE_WIFI, ConnectivityManager.TYPE_MOBILE};
                 //It's like the first way
                 if(TeamBroadcastReceiver.isNetWorkAvailable(context,type) == true){
-                    FirebaseDatabase.getInstance().getReference("User").addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Toast.makeText(context, "Change.....", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                    //thread.start();
                 }
                 else{
                     Toast.makeText(HistoryAndHobbyActivity.this, "No internet", Toast.LENGTH_SHORT).show();
                 }
             }
         };
+
         registerReceiver(broadcastReceiver,intentFilter);
     }
 
@@ -249,7 +268,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String value = (String) listView.getItemAtPosition(position);
-                if(value == "Log out")
+                if(value == getString(R.string.Logout))
                 {
                     pMenuFragment.receivedLogout();
                 }
@@ -334,6 +353,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
             Dialog dialog=new Dialog(HistoryAndHobbyActivity.this);
             dialog.setContentView(R.layout.dialog_language);
+            dialog.setCanceledOnTouchOutside(true);
             dialog.show();
             TextView txtVietnamese=dialog.findViewById(R.id.txtVietnamese);
             TextView txtEnglish=dialog.findViewById(R.id.txtEnglish);
@@ -343,16 +363,21 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                 @Override
                 public void onClick(View view) {
                         saveLanguage("vi");
+                        dialog.dismiss();
                 }
             });
             btnEnglish.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     saveLanguage("en");
+                    dialog.dismiss();
                 }
             });
 
             return true;
+        }
+        else if(id==R.id.btnlogout){
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -378,6 +403,8 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
         Locale locale = new Locale(getLangCode());
         Locale.setDefault(locale);
+
+
         Configuration config = new Configuration();
         config.locale = locale;
         getResources().updateConfiguration(config, getResources().getDisplayMetrics());
@@ -457,7 +484,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
 
     @Override
     public ArrayList<Tourist_Location> GetLocationData(ArrayList<Tourist_Location> tourist_locations) {
-
+        loadDaTaDialog.dismiss();
         //lấy dữ liệu của tất cả các địa điểm để truyền qua activity khác
         allLocation = tourist_locations;
 //---------------------------------------------------------------------------------------------------------
@@ -562,8 +589,6 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     protected void onResume() {
         super.onResume();
     }
-
-
 }
 
 

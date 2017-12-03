@@ -21,7 +21,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.bruce.myapp.Adapter.SectionsPageAdapter;
@@ -61,6 +60,7 @@ public class InformationAndCommentsActivity extends AppCompatActivity {
         setupTitle(txtTitle);
         setupViewPager(mViewPage);
         setupTabLayout(tabLayout,mViewPage);
+        ratingBar.setRating(tls.get(0).getStar());
         setDialogRate(btnRate,InformationAndCommentsActivity.this);
         onClickFabComment();
     }
@@ -88,6 +88,7 @@ public class InformationAndCommentsActivity extends AppCompatActivity {
         ratingBar = findViewById(R.id.ratingBar_Main);
         fabComment = findViewById(R.id.floatingActionButton_Comment);
         btnRate=findViewById(R.id.btnrated);
+
     }
     public void setDialogRate(Button btnrate, Context context){
         btnrate.setOnClickListener(new View.OnClickListener() {

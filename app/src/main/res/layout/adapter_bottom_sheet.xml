@@ -6,76 +6,66 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="#212121">
-        <LinearLayout
-            android:orientation="vertical"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <android.support.v7.widget.CardView
+            android:layout_marginTop="5dp"
+            android:layout_height="200dp"
+            android:layout_weight="4.5"
+            app:cardCornerRadius="5dp">
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_height="200dp"
-                android:layout_weight="4.5"
-                app:cardCornerRadius="5dp"></android.support.v7.widget.CardView>
-
-            <ScrollView
-                android:layout_weight="5"
-                android:layout_marginTop="2dp"
-                android:layout_width="match_parent"
-                android:layout_height="0dp">
+                android:layout_height="match_parent">
                 <TextView
-                    android:id="@+id/txt_BtmSheet"
-                    android:padding="5dp"
-                    android:background="#FFFDE7"
-                    android:textSize="20dp"
-                    android:textColor="#212121"
-                    android:text="@string/Information"
+                    android:id="@+id/txt_BtmSheet_LocationName"
+                    android:layout_weight="0"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="Name"
+                    android:maxLines="1"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    />
-
-                <LinearLayout
+                    android:layout_height="wrap_content" />
+                <ImageView
+                    android:id="@+id/img_BtmSheet"
+                    android:src="@drawable/buttoncmt"
+                    android:layout_weight="10"
                     android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:padding="3dp"
+                    android:scaleType="fitXY"
+                    android:layout_marginBottom="8dp"/>
+                <RatingBar
+                    android:id="@+id/rB_BtmSheet_Star"
+                    android:layout_gravity="center"
+                    style="@style/RatingBar"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:progressTint="#FFD600"
+                    android:rating="3.5" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
 
-                    <TextView
-                        android:id="@+id/txt_BtmSheet_LocationName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/Name"
-                        android:textSize="20dp"
-                        android:textStyle="bold" />
+        <ScrollView
+            android:layout_weight="5"
+            android:layout_marginTop="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+            <TextView
+                android:id="@+id/txt_BtmSheet"
+                android:padding="5dp"
+                android:background="#FFFDE7"
+                android:textSize="20dp"
+                android:textColor="#212121"
+                android:text="basic information ............"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+        </ScrollView>
 
-                    <ImageView
-                        android:id="@+id/img_BtmSheet"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_weight="10"
-                        android:padding="3dp"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/buttoncmt" />
-
-                    <RatingBar
-                        android:id="@+id/rB_BtmSheet_Star"
-                        style="@style/RatingBar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:progressTint="#FFD600"
-                        android:rating="3.5" />
-                </LinearLayout>
-            </ScrollView>
-
-        </LinearLayout>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

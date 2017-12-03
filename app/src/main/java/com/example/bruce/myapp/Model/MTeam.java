@@ -69,29 +69,7 @@ public class MTeam {
 
                             @Override
                             public void onChildRemoved(DataSnapshot dataSnapshot1) {
-                                FirebaseDatabase.getInstance().getReference("User").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren())
-                                        {
-                                            if(dataSnapshot1.getKey().contains(dataSnapshot2.getKey()) && !dataSnapshot1.getKey().contains(FirebaseAuth.getInstance().getCurrentUser().getUid()) )
-                                            {
-                                                UserProfile constructer_userProfile=dataSnapshot2.getValue(UserProfile.class);
-                                                listUser.remove(0);
-                                                // callback.GetListUser(listUser);
-                                                Log.d("xzccx","sad");
-                                                adapter.notifyDataSetChanged();
-//                                    teamAdapter.notifyDataSetChanged();
 
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
                             }
 
                             @Override

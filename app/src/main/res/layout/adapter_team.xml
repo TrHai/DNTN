@@ -12,11 +12,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:visibility="invisible"
+            android:id="@+id/moveMember"
+            android:layout_width="50px"
+            android:layout_height="50px"
+            android:background="#FFFFFF"
             android:layout_alignParentRight="true"
-            android:src="@drawable/asd"/>
+            android:src="@drawable/if_delete_70984"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

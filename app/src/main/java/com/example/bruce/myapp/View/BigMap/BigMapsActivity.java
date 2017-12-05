@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
@@ -36,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bruce.myapp.Adapter.MenumapAdapter;
+import com.example.bruce.myapp.CircleTransform;
 import com.example.bruce.myapp.Data.Tourist_Location;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Direction.DirectionFinder;
@@ -71,6 +73,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
 
 import java.io.UnsupportedEncodingException;
@@ -78,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnMapReadyCallback,DirectionFinderListener,MenumapAdapter.RecyclerViewClicklistener {
 
@@ -165,6 +170,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
             }
             showTeamUser(location.getLatitude(),location.getLongitude());
 
+
         });
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -224,14 +230,28 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                                                 FirebaseDatabase.getInstance().getReference("User").child(key).addValueEventListener(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        UserProfile constructer_userProfile=dataSnapshot.getValue(UserProfile.class);
-                                                        Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
-                                                        locationUser.add(mMap.addMarker(new MarkerOptions()
-                                                                .title("Friend")
-                                                                .position(new LatLng(location.latitude, location.longitude))
-                                                                .flat(true)
-                                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                                                                .anchor(0.5f, 1)));
+                                                        try {
+                                                            Bitmap adad = Ion.with(BigMapsActivity.this)
+                                                                    .load(dataSnapshot.child("Image").getValue().toString())
+                                                                    .withBitmap()
+                                                                    .asBitmap()
+                                                                    .get();
+                                                            CircleTransform circleTransform = new CircleTransform();
+                                                            Bitmap bitmap=circleTransform.transform(adad);
+
+                                                            locationUser.add(mMap.addMarker(new MarkerOptions()
+                                                                    .title(dataSnapshot.child("Name").getValue().toString())
+                                                                    .position(new LatLng(location.latitude, location.longitude))
+                                                                    .flat(true)
+                                                                    .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap,50,50,true)))
+                                                                    .anchor(0.5f, 1)));
+                                                        } catch (InterruptedException e) {
+                                                            e.printStackTrace();
+                                                        } catch (ExecutionException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                              //          Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
+
 
                                                     }
 
@@ -286,7 +306,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
                 }
             });
-
         }
     }
     private void circleCaptain(GeoFire geoFire,String idCaptain) {
@@ -305,7 +324,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                     circle.add( mMap.addCircle(new CircleOptions()
                             .center(new LatLng(location.latitude,location.longitude))
                             .radius(500) //tinh theo met'
-                            .strokeColor(Color.RED)
+                            .strokeColor(Color.BLUE)
                             .fillColor(0x220000FF)));
                     GeoQuery geoQuery;
                     geoQuery=geoFire.queryAtLocation(new GeoLocation(location.latitude,location.longitude),0.5f);
@@ -388,6 +407,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
         return bitmap;
     }
+
 
     private void markAllLocation(ArrayList<Tourist_Location> tourist_locations,GoogleMap mMap,RecyclerView recyclerView_ListLocation, MenumapAdapter adapter, LatLng mLocation)
     {

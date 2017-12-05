@@ -99,12 +99,8 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
                 }
             });
         });
-        RemoveTeam();
     }
 
-    private void RemoveTeam() {
-
-    }
 
     private void initialize() {
         recyclerViewTeam=findViewById(R.id.recyclerViewTeam);

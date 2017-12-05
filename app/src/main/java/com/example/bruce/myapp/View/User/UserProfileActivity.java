@@ -3,8 +3,13 @@ package com.example.bruce.myapp.View.User;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -23,15 +28,22 @@ import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.User.PUser;
 import com.example.bruce.myapp.R;
 import com.example.bruce.myapp.View.HistoryAndHobby.HistoryAndHobbyActivity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class UserProfileActivity extends AppCompatActivity implements IViewUserProfile {
 
     private FirebaseUser user;
@@ -182,6 +194,56 @@ public class UserProfileActivity extends AppCompatActivity implements IViewUserP
         firebaseAuth= FirebaseAuth.getInstance();
 
 
+    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    FirebaseStorage storage=FirebaseStorage.getInstance();
+    StorageReference storageRef=storage.getReference();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==REQUEST_CODE_IMAGE && resultCode==RESULT_OK && data!=null)
+        {
+            Bitmap bitmap= (Bitmap) data.getExtras().get("data");
+            //Drawable d = new BitmapDrawable(getResources(), bitmap);
+            //toolbarLayout.setBackground(d);
+            CircleTransform circleTransform = new CircleTransform();
+            Bitmap circleBitmap = circleTransform.transform(bitmap);
+            imageView.setImageBitmap(circleBitmap);
+
+            StorageReference mountainsRef = storageRef.child("image_"+user.getEmail());
+            imageView.setDrawingCacheEnabled(true);
+            imageView.buildDrawingCache();
+            Bitmap bitmap1 = imageView.getDrawingCache();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            bitmap1.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            byte[] data1 = baos.toByteArray();
+
+            UploadTask uploadTask = mountainsRef.putBytes(data1);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+
+                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                    FirebaseDatabase.getInstance().getReference().child("User").child(firebaseAuth.getCurrentUser().getUid()).child("Image").setValue(downloadUrl.toString());
+                    UserProfileChangeRequest profileChangeRequest=new UserProfileChangeRequest.Builder()
+
+                            .setPhotoUri(Uri.parse(downloadUrl.toString()))
+                            .build();
+                    user.updateProfile(profileChangeRequest);
+
+
+                }
+            });
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

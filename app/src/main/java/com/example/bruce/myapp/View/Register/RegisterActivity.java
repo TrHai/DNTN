@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -69,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
                             firebaseAuth.getCurrentUser().sendEmailVerification();
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(edtName.getText().toString())
-                                  //  .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
+                                    .setPhotoUri(Uri.parse("https://scontent.fsgn5-1.fna.fbcdn.net/v/t31.0-1/c379.0.1290.1290/10506738_10150004552801856_220367501106153455_o.jpg?oh=31f7ca1c6afb7b2ff08b0a73fd383def&oe=5ACE2A7C"))
                                     .build();
 
                             firebaseAuth.getCurrentUser().updateProfile(profileUpdates)
@@ -80,6 +82,11 @@ public class RegisterActivity extends AppCompatActivity {
                                                 if(dialogRegister.isShowing()){
                                                     dialogRegister.dismiss();
                                                 }
+                                                FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid()).child("Image").setValue("https://scontent.fsgn5-1.fna.fbcdn.net/v/t31.0-1/c379.0.1290.1290/10506738_10150004552801856_220367501106153455_o.jpg?oh=31f7ca1c6afb7b2ff08b0a73fd383def&oe=5ACE2A7C");
+                                                FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid()).child("Hobbie").setValue("1,2");
+                                                FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid()).child("Behavior").setValue("1,2");
+                                                FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid()).child("Gender").setValue(true);
+
                                                 AlertDialog.Builder tb=new AlertDialog.Builder(RegisterActivity.this)
                                                         .setMessage("Register Success!,\nPlease check your mail! ")
                                                         .setPositiveButton("Đóng", new DialogInterface.OnClickListener() {

@@ -37,7 +37,7 @@ public class MTeam {
                         .addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot1, String s) {
-                                FirebaseDatabase.getInstance().getReference("User").addValueEventListener(new ValueEventListener() {
+                                FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren())

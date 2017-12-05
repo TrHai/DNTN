@@ -1,9 +1,25 @@
 package com.example.bruce.myapp.Model;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+
+import com.example.bruce.myapp.CircleTransform;
 import com.example.bruce.myapp.Presenter.User.IUser;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by Admin on 27/11/2017.
@@ -12,7 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 public class MUserProfile {
     private FirebaseAuth firebaseAuth= FirebaseAuth.getInstance();
     private FirebaseUser user=firebaseAuth.getCurrentUser();
-    DatabaseReference mData;
 
     IUser callback;
 
@@ -48,4 +63,5 @@ public class MUserProfile {
             callback.oldPasswordIsEmpty();
         }
     }
+
 }

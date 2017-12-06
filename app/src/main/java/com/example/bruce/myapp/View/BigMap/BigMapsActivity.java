@@ -26,6 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -202,6 +203,9 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
     private void showTeamUser(double lat,double log) {
         {
+            for (Marker maker :locationUser)
+            maker.remove();
+            locationUser.clear();
             final View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
             DatabaseReference mDataTeamUser= FirebaseDatabase.getInstance().getReference("TeamUser");
             DatabaseReference mDataCheckTeam= FirebaseDatabase.getInstance().getReference("CheckTeam");
@@ -216,8 +220,8 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                         mDataTeamUser.child(idCaptain).child("member").addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                                for (Marker maker :locationUser)
-                                    maker.remove();
+
+                                Log.d("sadsad",locationUser.size()+"");
                                 geoFire.getLocation(String.valueOf(dataSnapshot.getKey()), new LocationCallback() {
                                     @Override
                                     public void onLocationResult(String key, final GeoLocation location) {
@@ -230,27 +234,14 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                                                 FirebaseDatabase.getInstance().getReference("User").child(key).addValueEventListener(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        try {
-                                                            Bitmap adad = Ion.with(BigMapsActivity.this)
-                                                                    .load(dataSnapshot.child("Image").getValue().toString())
-                                                                    .withBitmap()
-                                                                    .asBitmap()
-                                                                    .get();
-                                                            CircleTransform circleTransform = new CircleTransform();
-                                                            Bitmap bitmap=circleTransform.transform(adad);
-
-                                                            locationUser.add(mMap.addMarker(new MarkerOptions()
-                                                                    .title(dataSnapshot.child("Name").getValue().toString())
-                                                                    .position(new LatLng(location.latitude, location.longitude))
-                                                                    .flat(true)
-                                                                    .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap,50,50,true)))
-                                                                    .anchor(0.5f, 1)));
-                                                        } catch (InterruptedException e) {
-                                                            e.printStackTrace();
-                                                        } catch (ExecutionException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                              //          Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
+                                                        Picasso.with(BigMapsActivity.this).load(dataSnapshot.child("Image").getValue().toString()).into(makerImg);
+                                                        locationUser.add(mMap.addMarker(new MarkerOptions()
+                                                                .title("Friend")
+                                                                .position(new LatLng(location.latitude, location.longitude))
+                                                                .flat(true)
+                                                                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(BigMapsActivity.this, marker)))
+                                                                .anchor(0.5f, 1)));
+                                              //              Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
 
 
                                                     }
@@ -320,12 +311,14 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                         {
                             cirlcee.remove();
                         }
+                        circle.clear();
                     }
                     circle.add( mMap.addCircle(new CircleOptions()
                             .center(new LatLng(location.latitude,location.longitude))
                             .radius(500) //tinh theo met'
                             .strokeColor(Color.BLUE)
                             .fillColor(0x220000FF)));
+                    Log.d("qưeqwe",circle.size()+"");
                     GeoQuery geoQuery;
                     geoQuery=geoFire.queryAtLocation(new GeoLocation(location.latitude,location.longitude),0.5f);
                     geoQuery.removeAllListeners();

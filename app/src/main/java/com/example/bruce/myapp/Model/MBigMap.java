@@ -1,21 +1,31 @@
 package com.example.bruce.myapp.Model;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.BigMap.IBigMap;
 import com.example.bruce.myapp.R;
+import com.example.bruce.myapp.View.BigMap.BigMapsActivity;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -84,4 +94,140 @@ public class MBigMap {
         distance = c*(111.2)*1000;
         return distance;
     }
+    boolean area=true;
+    public void handleShowTeamUser(double lat,double log, List<Marker> locationUser,List<Circle> circle) {
+        {
+            for (Marker maker :locationUser)
+                maker.remove();
+            locationUser.clear();
+            DatabaseReference mDataTeamUser= FirebaseDatabase.getInstance().getReference("TeamUser");
+            DatabaseReference mDataCheckTeam= FirebaseDatabase.getInstance().getReference("CheckTeam");
+            mDataCheckTeam.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
+                    {
+                        String idCaptain= dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Captain").getValue().toString();
+                        GeoFire geoFire=new GeoFire(mDataTeamUser.child(idCaptain).child("member"));
+                        //Đấy latLog của Thành viên trong team lên firebase
+                        mDataTeamUser.child(idCaptain).child("member").addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                                geoFire.getLocation(String.valueOf(dataSnapshot.getKey()), new LocationCallback() {
+                                    @Override
+                                    public void onLocationResult(String key, final GeoLocation location) {
+                                        if (location != null)
+                                        {
+                                            callback.addMakerMember(key,location,dataSnapshot);
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        // Đẩy location của User đang đăng nhập lên firebase
+                        geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(), new GeoLocation(lat, log));
+                        circleCaptain(geoFire,idCaptain,circle);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    private void circleCaptain(GeoFire geoFire,String idCaptain,List<Circle> circle) {
+        geoFire.getLocation(idCaptain, new LocationCallback() {
+            @Override
+            public void onLocationResult(String key, GeoLocation location) {
+                if (location != null) {
+                    if(circle!=null)
+                    {
+                        for (Circle cirlcee:circle)
+                        {
+                            cirlcee.remove();
+                        }
+                        circle.clear();
+                    }
+                    callback.circleMarkerCaptain(location,circle);
+                    GeoQuery geoQuery;
+                    geoQuery=geoFire.queryAtLocation(new GeoLocation(location.latitude,location.longitude),0.5f);
+                    geoQuery.removeAllListeners();
+                    geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+                        @Override
+                        public void onKeyEntered(String key, final GeoLocation location) {
+
+                            if (FirebaseAuth.getInstance().getCurrentUser().getUid() == key) {
+                                if (area == true) {
+                                    callback.intoArea();
+                                    area=false;
+                                }
+                            }
+                        }
+                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+                        @Override
+                        public void onKeyExited(String key) {
+                            if (FirebaseAuth.getInstance().getCurrentUser().getUid() == key) {
+                                if (area == false) {
+                                    callback.outArea();
+                                    area=true;
+                                }
+                            }
+                        }
+                        @Override
+                        public void onKeyMoved(String key, GeoLocation location) {
+                        }
+
+                        @Override
+                        public void onGeoQueryReady() {
+
+                        }
+
+                        @Override
+                        public void onGeoQueryError(DatabaseError error) {
+
+                        }
+                    });
+                } else {
+                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.err.println("There was an error getting the GeoFire location: " + databaseError);
+            }
+        });
+    }
+
+
 }

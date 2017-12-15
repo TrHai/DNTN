@@ -102,7 +102,7 @@ public class MBigMap {
             locationUser.clear();
             DatabaseReference mDataTeamUser= FirebaseDatabase.getInstance().getReference("TeamUser");
             DatabaseReference mDataCheckTeam= FirebaseDatabase.getInstance().getReference("CheckTeam");
-            mDataCheckTeam.addValueEventListener(new ValueEventListener() {
+            mDataCheckTeam.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
@@ -110,39 +110,25 @@ public class MBigMap {
                         String idCaptain= dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Captain").getValue().toString();
                         GeoFire geoFire=new GeoFire(mDataTeamUser.child(idCaptain).child("member"));
                         //Đấy latLog của Thành viên trong team lên firebase
-                        mDataTeamUser.child(idCaptain).child("member").addChildEventListener(new ChildEventListener() {
+                        mDataTeamUser.child(idCaptain).child("member").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                                geoFire.getLocation(String.valueOf(dataSnapshot.getKey()), new LocationCallback() {
-                                    @Override
-                                    public void onLocationResult(String key, final GeoLocation location) {
-                                        if (location != null)
-                                        {
-                                            callback.addMakerMember(key,location,dataSnapshot);
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
+                                {
+                                    geoFire.getLocation(String.valueOf(dataSnapshot1.getKey()), new LocationCallback() {
+                                        @Override
+                                        public void onLocationResult(String key, final GeoLocation location) {
+                                            if (location != null)
+                                            {
+                                                callback.addMakerMember(key,location,dataSnapshot1);
+                                            }
                                         }
-                                    }
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                                    }
-                                });
-
-
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                                        }
+                                    });
+                                }
                             }
 
                             @Override

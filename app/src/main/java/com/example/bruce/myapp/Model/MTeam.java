@@ -27,8 +27,6 @@ public class MTeam {
     }
 
     public void handleAddListUser(TeamAdapter adapter,ArrayList<UserProfile> listUser) {
-
-
         FirebaseDatabase.getInstance().getReference("CheckTeam").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -37,6 +35,7 @@ public class MTeam {
                         .addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot1, String s) {
+                                //dataSnapshot1 đang đứng ở những key  của member
                                 FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {

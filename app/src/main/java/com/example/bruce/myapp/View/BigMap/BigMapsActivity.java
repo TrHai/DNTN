@@ -160,11 +160,9 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
         //lấy vi trí người dùng
         mMap.setOnMyLocationChangeListener((location) -> {
-            origin = location.getLatitude() + ", " + location.getLongitude();
-            mLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
             if (count != true) {
-
+                origin = location.getLatitude() + ", " + location.getLongitude();
+                mLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mLocation, 14));
                 count = true;
             }
@@ -437,10 +435,10 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         //tạo marker trừ mình ra
         if (dataSnapshot.getKey().toString() != FirebaseAuth.getInstance().getCurrentUser().getUid()) {
             //Lấy hình user
-            FirebaseDatabase.getInstance().getReference("User").child(key).addValueEventListener(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("User").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Picasso.with(BigMapsActivity.this).load(dataSnapshot.child("Image").getValue().toString()).into(makerImg);
+                    //                    Picasso.with(BigMapsActivity.this).load(dataSnapshot.child("Image").getValue().toString()).into(makerImg);
 //                    locationUser.add(mMap.addMarker(new MarkerOptions()
 //                            .title(dataSnapshot.child("Name").getValue().toString())
 //                            .position(new LatLng(location.latitude, location.longitude))
@@ -449,28 +447,27 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 //                            .anchor(0.5f, 1)));
 //                                  Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
                     //Code vẽ hình thành bitmap vòng tròn
-                                                        try {
-                                                            Bitmap adad = Ion.with(BigMapsActivity.this)
-                                                                    .load(dataSnapshot.child("Image").getValue().toString())
-                                                                    .withBitmap()
-                                                                    .asBitmap()
-                                                                    .get();
-                                                            CircleTransform circleTransform = new CircleTransform();
-                                                            Bitmap bitmap = circleTransform.transform(adad);
+                    try {
+                        Bitmap adad = Ion.with(BigMapsActivity.this)
+                                .load(dataSnapshot.child("Image").getValue().toString())
+                                .withBitmap()
+                                .asBitmap()
+                                .get();
+                        CircleTransform circleTransform = new CircleTransform();
+                        Bitmap bitmap = circleTransform.transform(adad);
 
-                                                            locationUser.add(mMap.addMarker(new MarkerOptions()
-                                                                    .title(dataSnapshot.child("Name").getValue().toString())
-                                                                    .position(new LatLng(location.latitude, location.longitude))
-                                                                    .flat(true)
-                                                                    .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 50, 50, true)))
-                                                                    .anchor(0.5f, 1)))
-                                                            ;
-                                                        } catch (InterruptedException e) {
-                                                            e.printStackTrace();
-                                                        } catch (ExecutionException e) {
-                                                            e.printStackTrace();
-                                                        }
-
+                        locationUser.add(mMap.addMarker(new MarkerOptions()
+                                .title(dataSnapshot.child("Name").getValue().toString())
+                                .position(new LatLng(location.latitude, location.longitude))
+                                .flat(true)
+                                .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 75, 75, true)))
+                                .anchor(0.5f, 1)))
+                        ;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -478,7 +475,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
                 }
             });
-
         }
     }
 

@@ -148,7 +148,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                     idUser=dataSnapshot.getKey();
                     idCaptain =dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getValue().toString();
 
-                    FirebaseDatabase.getInstance().getReference("User").child(idCaptain).child("Email").addValueEventListener(new ValueEventListener() {
+                    FirebaseDatabase.getInstance().getReference("User").child(idCaptain).child("Email").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             emailCaptain=dataSnapshot.getValue().toString();

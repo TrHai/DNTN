@@ -41,8 +41,7 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".View.HistoryAndHobby.HistoryAndHobbyActivity" />
+        <activity android:name=".View.HistoryAndHobby.HistoryAndHobbyActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -58,24 +57,31 @@
         <activity
             android:name=".View.BigMap.BigMapsActivity"
             android:label="@string/title_activity_big_maps" />
-
         <activity
             android:name=".View.Information_And_Comments.InformationAndCommentsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".View.User.UserProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".View.Team.TeamActivity"></activity>
-        <activity android:name=".View.Write_Comment.Write_Comment_Activity"></activity>
-        <activity android:name=".View.Register.RegisterActivity"></activity>
+        <activity android:name=".View.Team.TeamActivity" />
+        <activity android:name=".View.Write_Comment.Write_Comment_Activity" />
+        <activity android:name=".View.Register.RegisterActivity" />
+
         <receiver android:name=".TeamBroadcastReceiver">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.location.MODE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".ActivityChat"
+            android:label="@string/title_activity_chat"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Phongchat"></activity>
     </application>
 
 </manifest>

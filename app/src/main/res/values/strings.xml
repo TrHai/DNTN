@@ -38,5 +38,10 @@
     <string name="English">English</string>
     <string name="Recommended">Recommended</string>
     <string name="Since">Since</string>
+    <string name="title_activity_chat">ActivityChat</string>
+    <string name="Enter_your_Chat_Message">Enter your Message....</string>
+    <string name="Please_Enter_your_Message">Plese enter your message</string>
+    <string name="Create_your_room_chat">Create your room chat</string>
+    <string name="Create_room">Create room</string>
 
 </resources>

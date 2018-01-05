@@ -1,23 +1,29 @@
 package com.example.bruce.myapp.View.Team;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.bruce.myapp.ActivityChat;
 import com.example.bruce.myapp.Adapter.TeamAdapter;
+import com.example.bruce.myapp.Data.ChatRoom;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Model.MTeam;
+import com.example.bruce.myapp.Phongchat;
 import com.example.bruce.myapp.Presenter.Team.PTeam;
 import com.example.bruce.myapp.R;
 import com.example.bruce.myapp.View.HistoryAndHobby.HistoryAndHobbyActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,6 +39,7 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
     Button btnInvite;
     EditText edtInvite;
     ArrayList<UserProfile> listUser;
+    Button btnchonRoom;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,13 +106,24 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
                 }
             });
         });
+
+        btnchonRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(TeamActivity.this, Phongchat.class);
+                FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+                intent.putExtra("userid",user.getUid());
+                startActivity(intent);
+
+            }
+        });
+
     }
-
-
     private void initialize() {
         recyclerViewTeam=findViewById(R.id.recyclerViewTeam);
         btnInvite = findViewById(R.id.btnInvite);
         edtInvite=findViewById(R.id.edtInvite);
+        btnchonRoom=findViewById(R.id.btnchonphong);
     }
     @Override
     public void onBackPressed() {

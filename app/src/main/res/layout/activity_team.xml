@@ -31,4 +31,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linear"
         ></android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button
+            android:id="@+id/btnchonphong"
+            android:text="Chọn phòng chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </RelativeLayout>

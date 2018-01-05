@@ -31,7 +31,7 @@ public class Phongchat extends AppCompatActivity {
     ArrayList<ChatRoom>listRoom;
     RoomChatAdapter2 RoomAdapter;
     FirebaseDatabase database;
-    DatabaseReference myRef,myRefRoom;
+    DatabaseReference myRef,myRefRoom,myRefRoomChat;
 
     Button btnchat;
     @Override
@@ -42,15 +42,17 @@ public class Phongchat extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         myRef=database.getReference("ChatMessage");
         myRefRoom=database.getReference("Roomchat");
-
+        myRefRoomChat=database.getReference("Roomchat");
         addRoomChat();
         getItemRoom();
         btnchat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                ChatRoom chatRoom=new ChatRoom(user.getDisplayName(),user.getUid());
+                myRefRoomChat.child(user.getDisplayName()).removeValue();
+                myRefRoomChat.child(user.getDisplayName()).setValue(chatRoom);
                 Intent intent = new Intent(Phongchat.this, ActivityChat.class);
-                FirebaseUser user =FirebaseAuth.getInstance().getCurrentUser();
                 intent.putExtra("roomname",user.getUid());
                 startActivity(intent);
 

@@ -68,12 +68,7 @@
         <activity android:name=".View.Write_Comment.Write_Comment_Activity" />
         <activity android:name=".View.Register.RegisterActivity" />
 
-        <activity android:name=".View.Team.TeamActivity"
-                  android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".View.Write_Comment.Write_Comment_Activity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".View.Register.RegisterActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <receiver android:name=".TeamBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />

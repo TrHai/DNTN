@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.bruce.myapp.CircleTransform;
 import com.example.bruce.myapp.Data.MessageChats;
 import com.example.bruce.myapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -72,7 +73,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         holder.txtten.setText(listMessage.get(position).getUser());
         holder.txtMsgContent.setText(listMessage.get(position).getContent());
         holder.txtMsgTime.setText(listMessage.get(position).getTime());
-        Picasso.with(context).load(listMessage.get(position).ImageUser).into(holder.imageUser);
+        Picasso.with(context).load(listMessage.get(position).ImageUser).transform(new CircleTransform()).into(holder.imageUser);
 
     }
 

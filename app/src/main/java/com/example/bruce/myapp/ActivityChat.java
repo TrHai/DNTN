@@ -33,9 +33,8 @@ import java.util.Map;
 public class ActivityChat extends AppCompatActivity {
     EditText edtMessage;
     FirebaseDatabase firebaseDatabase;
-    DatabaseReference myRefChat;
-    DatabaseReference myRefUserChat;
-    DatabaseReference myRefRoomChat;
+    DatabaseReference myRefChat,myRefUserChat,myRefRoomChat,myRefRoomMember;
+
 
     RecyclerView recyclerChat;
     ArrayList<MessageChats>listMessage;
@@ -54,6 +53,7 @@ public class ActivityChat extends AppCompatActivity {
         myRefChat=firebaseDatabase.getReference("ChatMessage");
         myRefUserChat=firebaseDatabase.getReference("UserChat");
         myRefRoomChat=firebaseDatabase.getReference("Roomchat");
+        myRefRoomMember=firebaseDatabase.getReference("RoomChatMember");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -71,13 +71,35 @@ public class ActivityChat extends AppCompatActivity {
                     MessageChats messageChats=new MessageChats(edtMessage.getText().toString(),user.getDisplayName(),date,true,userid,String.valueOf(user.getPhotoUrl()));
                     myRefChat.child(roomname).child(key).setValue(messageChats);
                     myRefUserChat.child(userid).child(key).setValue(messageChats);
-                    ChatRoom chatRoom=new ChatRoom(user.getDisplayName(),user.getUid());
-                    myRefRoomChat.child(user.getDisplayName()).removeValue();
-                    myRefRoomChat.child(user.getDisplayName()).setValue(chatRoom);
+                    edtMessage.setText("");
                 }
             }
         });
         showMessage(roomname);
+        addRoomMember();
+    }
+
+    private void addRoomMember() {
+        myRefChat.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+                    Toast.makeText(ActivityChat.this, data.getKey()+"", Toast.LENGTH_SHORT).show();
+                    for(DataSnapshot data1 :data.getChildren()){
+                        MessageChats messageChats=data1.getValue(MessageChats.class);
+                        if(!data.getKey().equals(messageChats.getUserid())){
+
+                            myRefRoomMember.child(data.getKey()).child(messageChats.getUserid()).setValue(messageChats.getUser());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void showMessage(String room){

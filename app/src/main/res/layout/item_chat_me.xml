@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="right"
-                    app:cardBackgroundColor="#E0E0E0"
+                    app:cardBackgroundColor="#4169E1"
                     app:cardCornerRadius="10dp">
 
                     <LinearLayout
@@ -55,6 +55,7 @@
                         android:padding="10dp">
 
                         <TextView
+                            android:textColor="@android:color/white"
                             android:id="@+id/msgContent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -81,8 +82,7 @@
                 <ImageView
                     android:id="@+id/imgCircleUser"
                     android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@drawable/vietnamese" />
+                    android:layout_height="50dp" />
             </LinearLayout>
 
         </LinearLayout>

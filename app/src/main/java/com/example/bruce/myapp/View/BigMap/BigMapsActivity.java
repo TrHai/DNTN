@@ -26,6 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -112,7 +113,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
     private List<Polyline> polylinePaths;
     private List<Circle> circle=new ArrayList<>();
     List<Marker> locationUser=new ArrayList<>();
-
     private ProgressDialog progressDialog;
     boolean area=true;
 
@@ -160,15 +160,13 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
         //lấy vi trí người dùng
         mMap.setOnMyLocationChangeListener((location) -> {
-            origin = location.getLatitude() + ", " + location.getLongitude();
-            mLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
             if (count != true) {
-
+                origin = location.getLatitude() + ", " + location.getLongitude();
+                mLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mLocation, 14));
                 count = true;
             }
-            showTeamUser(location.getLatitude(),location.getLongitude());
+            pBigMap.receivedShowTeamUser(location.getLatitude(),location.getLongitude(),locationUser,circle);
 
 
         });
@@ -200,182 +198,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         setupBottomSheet(mMap,tourist_locations);
     }
 
-    private void showTeamUser(double lat,double log) {
-        {
-            final View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-            DatabaseReference mDataTeamUser= FirebaseDatabase.getInstance().getReference("TeamUser");
-            DatabaseReference mDataCheckTeam= FirebaseDatabase.getInstance().getReference("CheckTeam");
-            mDataCheckTeam.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
-                    {
-                        String idCaptain= dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Captain").getValue().toString();
-                        GeoFire geoFire=new GeoFire(mDataTeamUser.child(idCaptain).child("member"));
-                        //Đấy latLog của Thành viên trong team lên firebase
-                        mDataTeamUser.child(idCaptain).child("member").addChildEventListener(new ChildEventListener() {
-                            @Override
-                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                                for (Marker maker :locationUser)
-                                    maker.remove();
-                                geoFire.getLocation(String.valueOf(dataSnapshot.getKey()), new LocationCallback() {
-                                    @Override
-                                    public void onLocationResult(String key, final GeoLocation location) {
-                                        if (location != null)
-                                        {
-                                            final ImageView makerImg= (ImageView) marker.findViewById(R.id.markerimg);
-                                            //tạo marker trừ mình ra
-                                            if(dataSnapshot.getKey().toString()!=FirebaseAuth.getInstance().getCurrentUser().getUid()) {
-                                                //Lấy hình user
-                                                FirebaseDatabase.getInstance().getReference("User").child(key).addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        try {
-                                                            Bitmap adad = Ion.with(BigMapsActivity.this)
-                                                                    .load(dataSnapshot.child("Image").getValue().toString())
-                                                                    .withBitmap()
-                                                                    .asBitmap()
-                                                                    .get();
-                                                            CircleTransform circleTransform = new CircleTransform();
-                                                            Bitmap bitmap=circleTransform.transform(adad);
-
-                                                            locationUser.add(mMap.addMarker(new MarkerOptions()
-                                                                    .title(dataSnapshot.child("Name").getValue().toString())
-                                                                    .position(new LatLng(location.latitude, location.longitude))
-                                                                    .flat(true)
-                                                                    .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap,50,50,true)))
-                                                                    .anchor(0.5f, 1)));
-                                                        } catch (InterruptedException e) {
-                                                            e.printStackTrace();
-                                                        } catch (ExecutionException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                              //          Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
-
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-
-                                                    }
-                                                });
-
-
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(), new GeoLocation(lat, log));
-                        circleCaptain(geoFire,idCaptain);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
-    private void circleCaptain(GeoFire geoFire,String idCaptain) {
-
-        geoFire.getLocation(idCaptain, new LocationCallback() {
-            @Override
-            public void onLocationResult(String key, GeoLocation location) {
-                if (location != null) {
-                    if(circle!=null)
-                    {
-                        for (Circle cirlcee:circle)
-                        {
-                            cirlcee.remove();
-                        }
-                    }
-                    circle.add( mMap.addCircle(new CircleOptions()
-                            .center(new LatLng(location.latitude,location.longitude))
-                            .radius(500) //tinh theo met'
-                            .strokeColor(Color.BLUE)
-                            .fillColor(0x220000FF)));
-                    GeoQuery geoQuery;
-                    geoQuery=geoFire.queryAtLocation(new GeoLocation(location.latitude,location.longitude),0.5f);
-                    geoQuery.removeAllListeners();
-                    geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-                        @Override
-                        public void onKeyEntered(String key, final GeoLocation location) {
-
-                            if (FirebaseAuth.getInstance().getCurrentUser().getUid() == key) {
-                                if (area == true) {
-                                    sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Vào Khu Vực Của Team");
-                                    area=false;
-                                }
-                            }
-                        }
-                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-                        @Override
-                        public void onKeyExited(String key) {
-                            if (FirebaseAuth.getInstance().getCurrentUser().getUid() == key) {
-                                if (area == false) {
-                                    sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Đi Khỏi Khu Vực Team");
-                                    area=true;
-                                }
-                            }
-                        }
-                        @Override
-                        public void onKeyMoved(String key, GeoLocation location) {
-                        }
-
-                        @Override
-                        public void onGeoQueryReady() {
-
-                        }
-
-                        @Override
-                        public void onGeoQueryError(DatabaseError error) {
-
-                        }
-                    });
-                } else {
-                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.err.println("There was an error getting the GeoFire location: " + databaseError);
-            }
-        });
-    }
     private void sendNotification(String title, String content) {
         Notification.Builder builder=new Notification.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
@@ -604,5 +426,74 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
     @Override
     public void saveHistory() {
 
+    }
+
+    @Override
+    public void addMakerMember(String key,GeoLocation location,DataSnapshot dataSnapshot) {
+        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+        final ImageView makerImg = (ImageView) marker.findViewById(R.id.markerimg);
+        //tạo marker trừ mình ra
+        if (dataSnapshot.getKey().toString() != FirebaseAuth.getInstance().getCurrentUser().getUid()) {
+            //Lấy hình user
+            FirebaseDatabase.getInstance().getReference("User").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    //                    Picasso.with(BigMapsActivity.this).load(dataSnapshot.child("Image").getValue().toString()).into(makerImg);
+//                    locationUser.add(mMap.addMarker(new MarkerOptions()
+//                            .title(dataSnapshot.child("Name").getValue().toString())
+//                            .position(new LatLng(location.latitude, location.longitude))
+//                            .flat(true)
+//                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(BigMapsActivity.this, marker)))
+//                            .anchor(0.5f, 1)));
+//                                  Picasso.with(BigMapsActivity.this).load(constructer_userProfile.Image).into(makerImg);
+                    //Code vẽ hình thành bitmap vòng tròn
+                    try {
+                        Bitmap adad = Ion.with(BigMapsActivity.this)
+                                .load(dataSnapshot.child("Image").getValue().toString())
+                                .withBitmap()
+                                .asBitmap()
+                                .get();
+                        CircleTransform circleTransform = new CircleTransform();
+                        Bitmap bitmap = circleTransform.transform(adad);
+
+                        locationUser.add(mMap.addMarker(new MarkerOptions()
+                                .title(dataSnapshot.child("Name").getValue().toString())
+                                .position(new LatLng(location.latitude, location.longitude))
+                                .flat(true)
+                                .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 75, 75, true)))
+                                .anchor(0.5f, 1)))
+                        ;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void circleMarkerCaptain(GeoLocation location,List<Circle> circle) {
+        circle.add( mMap.addCircle(new CircleOptions()
+                .center(new LatLng(location.latitude,location.longitude))
+                .radius(500) //tinh theo met'
+                .strokeColor(Color.BLUE)
+                .fillColor(0x220000FF)));
+    }
+
+    @Override
+    public void intoArea() {
+        sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Vào Khu Vực Của Team");
+    }
+
+    @Override
+    public void outArea() {
+        sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Đi Khỏi Khu Vực Team");
     }
 }

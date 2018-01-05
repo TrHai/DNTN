@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.bruce.myapp.ActivityChat;
@@ -40,6 +41,7 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
     EditText edtInvite;
     ArrayList<UserProfile> listUser;
     Button btnchonRoom;
+    LinearLayout linear;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,52 +54,53 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
         teamAdapter.setClickListener(this);
         //Hiển thị Danh sách User lên recyclerView
         pTeam.receivedAddListUser(teamAdapter,listUser);
+        FirebaseDatabase.getInstance().getReference("TeamUser").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists()) {
+                    btnInvite.setVisibility(View.VISIBLE);
+                    edtInvite.setVisibility(View.VISIBLE);
+                    linear.getLayoutParams().height= LinearLayout.LayoutParams.WRAP_CONTENT;
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
         btnInvite.setOnClickListener(v -> {
             String EmailInvited=edtInvite.getText().toString();
-            FirebaseDatabase.getInstance().getReference("User").addChildEventListener(new ChildEventListener() {
+            FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    UserProfile userProfile=dataSnapshot.getValue(UserProfile.class);
-                    if(userProfile.Email.equals(EmailInvited))
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot dataSnapshot1 :dataSnapshot.getChildren())
                     {
-                        String IdUser=dataSnapshot.getKey();
-                        FirebaseDatabase.getInstance().getReference("CheckTeam").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.child(IdUser).exists()) {
-                                    Toast.makeText(TeamActivity.this, EmailInvited + "đã có nhóm rồi", Toast.LENGTH_SHORT).show();
-                                } else  if (dataSnapshot.child(IdUser).exists()==false) {
-                                    Log.d("ffff","wqeqwe");
-                                    FirebaseDatabase.getInstance().getReference("ListInviting").child(IdUser).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                                    Toast.makeText(TeamActivity.this, "Đã gởi lời mời đến " + EmailInvited, Toast.LENGTH_SHORT).show();
-                                    edtInvite.setText("");
+                        UserProfile userProfile=dataSnapshot1.getValue(UserProfile.class);
+                        if(userProfile.Email.equalsIgnoreCase(EmailInvited))
+                        {
+                            String IdUser=dataSnapshot1.getKey();
+                            FirebaseDatabase.getInstance().getReference("CheckTeam").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.child(IdUser).exists()) {
+                                        Toast.makeText(TeamActivity.this, EmailInvited + "đã có nhóm rồi", Toast.LENGTH_SHORT).show();
+                                    } else  if (dataSnapshot.child(IdUser).exists()==false) {
+                                        Log.d("ffff","wqeqwe");
+                                        FirebaseDatabase.getInstance().getReference("ListInviting").child(IdUser).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                        Toast.makeText(TeamActivity.this, "Đã gởi lời mời đến " + EmailInvited, Toast.LENGTH_SHORT).show();
+                                        edtInvite.setText("");
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
                                 }
-                            }
+                            });
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
+                        }
                     }
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
                 }
 
                 @Override
@@ -123,6 +126,7 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
         recyclerViewTeam=findViewById(R.id.recyclerViewTeam);
         btnInvite = findViewById(R.id.btnInvite);
         edtInvite=findViewById(R.id.edtInvite);
+        linear=findViewById(R.id.linear);
         btnchonRoom=findViewById(R.id.btnchonphong);
     }
     @Override

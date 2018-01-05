@@ -63,7 +63,6 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.ViewHolder>  {
                     holder.moveMember.setVisibility(View.VISIBLE);
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

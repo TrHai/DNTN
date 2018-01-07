@@ -20,6 +20,7 @@ public interface IViewHistoryAndHobby {
     UserProfile UserProfile(UserProfile User);
     ArrayList<Tourist_Location> GetUserHistoryLocation(ArrayList<Tourist_Location> tourist_locations);
     ArrayList<Tourist_Location> returnRecommendedList(ArrayList<Tourist_Location> tourist_locations);
+    void returnLocationNearByList(ArrayList<Tourist_Location> touristLocations);
     void HasTeam(String[] menuItem,ListView listView);
     void HasNoTeam(String[] menuItem,ListView listView);
 }

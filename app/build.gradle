@@ -58,6 +58,7 @@ dependencies {
     compile 'com.github.jd-alexander:LikeButton:0.2.3'
     compile 'com.github.sujithkanna:smileyrating:1.6.8'
     compile 'com.github.GrenderG:Toasty:1.2.5'
+    compile 'com.oguzdev:CircularFloatingActionMenu:1.0.2'
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
 }

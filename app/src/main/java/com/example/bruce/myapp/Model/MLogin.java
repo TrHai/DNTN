@@ -2,6 +2,7 @@ package com.example.bruce.myapp.Model;
 
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.Login.ILogin;
@@ -112,10 +113,9 @@ public class MLogin extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             UserProfile constructerUserProfile = new UserProfile(FirebaseAuth.getInstance().getCurrentUser().getEmail(),FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString());
                             callback.User_Profile(constructerUserProfile);
-
                             callback.LoginGoogleSuccess();
                         } else {
-
+                            Log.i("google","failed");
                         }
                         // ...
                     }

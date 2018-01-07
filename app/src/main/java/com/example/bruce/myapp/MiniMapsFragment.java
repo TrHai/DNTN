@@ -59,10 +59,8 @@ public class MiniMapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                LatLng MyLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
                 if(count == false) {
-
+                    LatLng MyLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(MyLocation, 14));
                     count = !count;
                 }

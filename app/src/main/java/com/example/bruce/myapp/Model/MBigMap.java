@@ -1,39 +1,25 @@
 package com.example.bruce.myapp.Model;
 
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.BigMap.IBigMap;
-import com.example.bruce.myapp.R;
-import com.example.bruce.myapp.View.BigMap.BigMapsActivity;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.geofire.LocationCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,13 +81,15 @@ public class MBigMap {
         return distance;
     }
     boolean area=true;
+
     public void handleShowTeamUser(double lat,double log, List<Marker> locationUser,List<Circle> circle) {
         {
-            for (Marker maker :locationUser)
+            for (Marker maker :locationUser){
                 maker.remove();
+            }
             locationUser.clear();
-            DatabaseReference mDataTeamUser= FirebaseDatabase.getInstance().getReference("TeamUser");
-            DatabaseReference mDataCheckTeam= FirebaseDatabase.getInstance().getReference("CheckTeam");
+            DatabaseReference mDataTeamUser = FirebaseDatabase.getInstance().getReference("TeamUser");
+            DatabaseReference mDataCheckTeam = FirebaseDatabase.getInstance().getReference("CheckTeam");
             mDataCheckTeam.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -147,6 +135,7 @@ public class MBigMap {
 
                 }
             });
+
         }
     }
 

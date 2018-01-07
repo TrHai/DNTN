@@ -43,5 +43,6 @@
     <string name="Please_Enter_your_Message">Plese enter your message</string>
     <string name="Create_your_room_chat">Create your room chat</string>
     <string name="Create_room">Create room</string>
+    <string name="nearBy">Near you</string>
 
 </resources>

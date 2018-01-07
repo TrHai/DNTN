@@ -8,6 +8,7 @@ import com.example.bruce.myapp.Data.Tourist_Location;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Model.MHistoryAndHobby;
 import com.example.bruce.myapp.View.HistoryAndHobby.IViewHistoryAndHobby;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -58,6 +59,9 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
         modelHistoryAndHobby.handleTeamCheker(idUser,menuItem,listView);
     }
 
+    public void receivedLocationNearByList(LatLng myLocation, ArrayList<Tourist_Location> tourist_locations){
+        modelHistoryAndHobby.handleLocationNearByList(myLocation,tourist_locations);
+    }
     @Override
      public void EnableGPS_API22() {
 
@@ -102,6 +106,11 @@ public class PHistoryAndHobby implements IHistoryAndHobby {
     @Override
     public ArrayList<Tourist_Location> returnRecommendedList(ArrayList<Tourist_Location> tourist_locations) {
         return callbackToView.returnRecommendedList(tourist_locations);
+    }
+
+    @Override
+    public void returnLocationNearByList(ArrayList<Tourist_Location> touristLocations) {
+        callbackToView.returnLocationNearByList(touristLocations);
     }
 
     @Override

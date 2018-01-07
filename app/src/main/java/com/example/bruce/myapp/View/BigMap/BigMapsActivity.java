@@ -12,12 +12,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.ActivityCompat;
@@ -26,7 +23,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -40,21 +36,16 @@ import android.widget.Toast;
 import com.example.bruce.myapp.Adapter.MenumapAdapter;
 import com.example.bruce.myapp.CircleTransform;
 import com.example.bruce.myapp.Data.Tourist_Location;
-import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Direction.DirectionFinder;
 import com.example.bruce.myapp.Direction.DirectionFinderListener;
 import com.example.bruce.myapp.Direction.Route;
 import com.example.bruce.myapp.GPSTracker;
 import com.example.bruce.myapp.Model.MBigMap;
+import com.example.bruce.myapp.Model.MTeam;
 import com.example.bruce.myapp.Presenter.BigMap.PBigMap;
 import com.example.bruce.myapp.R;
-import com.example.bruce.myapp.View.HistoryAndHobby.HistoryAndHobbyActivity;
 import com.example.bruce.myapp.View.Information_And_Comments.InformationAndCommentsActivity;
-import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryEventListener;
-import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -68,14 +59,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 import com.squareup.picasso.Picasso;
 
 import java.io.UnsupportedEncodingException;
@@ -114,8 +105,9 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
     private List<Circle> circle=new ArrayList<>();
     List<Marker> locationUser=new ArrayList<>();
     private ProgressDialog progressDialog;
-    boolean area=true;
 
+
+    MTeam mTeam = new MTeam();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,8 +125,118 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
         initialize();
         textViewToogle(txtToogle,drawer);
-    }
 
+        //circle floating action menu
+        floatActionMenu();
+
+    }
+    private void floatActionMenu(){
+
+        // in Activity Context
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(R.drawable.circle_menu);
+
+        FloatingActionButton actionButton = new FloatingActionButton.Builder(this)
+                .setContentView(icon)
+                .build();
+
+        SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
+
+        // set up button need gas
+        ImageView itemIconNeedGas = new ImageView(this);
+        itemIconNeedGas.setImageResource(R.drawable.need_gas);
+        SubActionButton btnNeedGas = itemBuilder.setContentView(itemIconNeedGas).build();
+
+        // set up button need fix
+        ImageView itemIconNeedFix = new ImageView(this);
+        itemIconNeedFix.setImageResource(R.drawable.need_fix);
+        SubActionButton btnNeedRepair = itemBuilder.setContentView(itemIconNeedFix).build();
+
+        // set up button crash
+        ImageView itemIconCrash = new ImageView(this);
+        itemIconCrash.setImageResource(R.drawable.crashed);
+        SubActionButton btnCrash = itemBuilder.setContentView(itemIconCrash).build();
+
+        // set up button sos
+        ImageView itemIconSOS = new ImageView(this);
+        itemIconSOS.setImageResource(R.drawable.asd);
+        SubActionButton btnSOS = itemBuilder.setContentView(itemIconSOS).build();
+
+        FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
+                .addSubActionView(btnNeedGas)
+                .addSubActionView(btnNeedRepair)
+                .addSubActionView(btnCrash)
+                .addSubActionView(btnSOS)
+                .attachTo(actionButton)
+                .build();
+
+        btnSOS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseDatabase.getInstance().getReference("Help").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Name").setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                FirebaseDatabase.getInstance().getReference("CheckTeam").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists())
+                        {
+                            String idCaptain= dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Captain").getValue().toString();
+                            FirebaseDatabase.getInstance().getReference().child("TeamUser").child(idCaptain).child("member").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
+                                    {
+                                        if(!dataSnapshot1.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                                        {
+                                            FirebaseDatabase.getInstance().getReference("Help").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Team").child(dataSnapshot1.getKey()).setValue("1");
+
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                actionMenu.close(true);
+            }
+        });
+
+
+        btnNeedGas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //up ping len firebase
+                mTeam.handlePingToMyTeam("GasProblem");
+                actionMenu.close(true);
+            }
+        });
+
+        btnNeedRepair.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //up ping len firebase
+                mTeam.handlePingToMyTeam("NeedRepair");
+                actionMenu.close(true);
+            }
+        });
+
+        btnCrash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //up ping len firebase
+                mTeam.handlePingToMyTeam("Crash");
+                actionMenu.close(true);
+            }
+        });
+    }
 
     private void initialize(){
 
@@ -167,8 +269,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                 count = true;
             }
             pBigMap.receivedShowTeamUser(location.getLatitude(),location.getLongitude(),locationUser,circle);
-
-
         });
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -184,8 +284,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
         //Google maps controller
         mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
 
         gps = new GPSTracker(this);
         mLocation= new LatLng(gps.getLatitude(),gps.getLongtitude());
@@ -215,6 +313,8 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         notification.defaults|=Notification.DEFAULT_SOUND;
         manager.notify(new Random().nextInt(),notification);
     }
+
+
     public static Bitmap createDrawableFromView(Context context, View view) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -233,7 +333,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
     private void markAllLocation(ArrayList<Tourist_Location> tourist_locations,GoogleMap mMap,RecyclerView recyclerView_ListLocation, MenumapAdapter adapter, LatLng mLocation)
     {
-
         for(Tourist_Location tl : tourist_locations){
 
             final  LatLng latLgData = new LatLng(tl.Latitude,tl.Longtitude);
@@ -266,6 +365,10 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                 TextView txt_BtmSheet = parentView.findViewById(R.id.txt_BtmSheet);
                 TextView txt_BtmSheet_LocationName = parentView.findViewById(R.id.txt_BtmSheet_LocationName);
                 RatingBar rB_BtmSheet_Star = parentView.findViewById(R.id.rB_BtmSheet_Star);
+                Button btnDirection = parentView.findViewById(R.id.btnSheet_Direction);
+                Button btnInformation = parentView.findViewById(R.id.btnSheet_Information);
+
+
                 for(Tourist_Location tl : tourist_locations){
                     if(tl.getLocationName().equals(marker.getTitle()) && tl.getAddress().equals(marker.getSnippet())){
                         Picasso.with(BigMapsActivity.this).load(tl.getLocationImg()).into(img_BtmSheet);
@@ -273,9 +376,31 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                         txt_BtmSheet_LocationName.setText(tl.getLocationName());
                         rB_BtmSheet_Star.setRating(tl.getStar());
                         bottomSheetDialog.show();
+
+                        btnInformation.setOnClickListener(v ->{
+                            bottomSheetDialog.dismiss();
+                            //lưu lại lịch sử xem của user
+                            pBigMap.receivedSaveHistoryAndBehavior(tl.location_ID,tl.getKindOfLocation(), FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            ArrayList<Tourist_Location> tls = new ArrayList<>();
+                            tls.add(tl);
+                            Intent infor = new Intent(BigMapsActivity.this, InformationAndCommentsActivity.class);
+                            infor.putParcelableArrayListExtra("tourist_location",tls);
+                            startActivity(infor);
+                        });
                         break;
                     }
                 }
+
+                StringBuilder origin = new StringBuilder();
+                StringBuilder destination = new StringBuilder();
+                origin.append(mLocation.latitude+", "+mLocation.longitude);
+                destination.append(marker.getPosition().latitude+ ", "+marker.getPosition().longitude);
+
+                btnDirection.setOnClickListener(v ->{
+                    bottomSheetDialog.dismiss();
+                    sendRequest(origin.toString(),destination.toString());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(),14));
+                });
                 return false;
             }
         });
@@ -294,14 +419,6 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         txtToogle.setOnClickListener(v ->{
             drawer.openDrawer(Gravity.START);
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-        Intent intent = new Intent(BigMapsActivity.this, HistoryAndHobbyActivity.class);
-        startActivity(intent);
     }
 
     @Override
@@ -433,12 +550,13 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
         View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
         final ImageView makerImg = (ImageView) marker.findViewById(R.id.markerimg);
         //tạo marker trừ mình ra
-        if (dataSnapshot.getKey().toString() != FirebaseAuth.getInstance().getCurrentUser().getUid()) {
+        if (!dataSnapshot.getKey().toString().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             //Lấy hình user
             FirebaseDatabase.getInstance().getReference("User").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    //                    Picasso.with(BigMapsActivity.this).load(dataSnapshot.child("Image").getValue().toString()).into(makerImg);
+
+//                    Picasso.with(BigMapsActivity.this).load(dataSnapshot.child("Image").getValue().toString()).into(makerImg);
 //                    locationUser.add(mMap.addMarker(new MarkerOptions()
 //                            .title(dataSnapshot.child("Name").getValue().toString())
 //                            .position(new LatLng(location.latitude, location.longitude))
@@ -460,14 +578,14 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
                                 .title(dataSnapshot.child("Name").getValue().toString())
                                 .position(new LatLng(location.latitude, location.longitude))
                                 .flat(true)
-                                .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 75, 75, true)))
-                                .anchor(0.5f, 1)))
-                        ;
+                                .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 75, 75, true)))));
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
+
                 }
 
                 @Override
@@ -475,6 +593,7 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
                 }
             });
+
         }
     }
 
@@ -489,11 +608,13 @@ public class BigMapsActivity extends FragmentActivity implements IViewBigMap,OnM
 
     @Override
     public void intoArea() {
-        sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Vào Khu Vực Của Team");
+        sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Vào Khu Vực Của Nhóm");
+        mTeam.SpeechGoogle(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Vào Khu Vực Của Nhóm",this);
     }
 
     @Override
     public void outArea() {
-        sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Đi Khỏi Khu Vực Team");
+        sendNotification("HiwhereAmI",FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Đi Khỏi Khu Vực Nhóm");
+        mTeam.SpeechGoogle(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()+": Bạn Đã Đi Xa Khu vực của nhóm",this);
     }
 }

@@ -138,10 +138,12 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
         GoogleSignInResult result= Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
         if(requestCode==RC_SIGN_IN) {
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 presenterLogin.receivedFirebaseAuthWithGoogle(account);
+
             }
             else
             {
@@ -232,7 +234,8 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
     //xử lý đăng nhập bằng google
     @Override
     public void LoginGoogleSuccess() {
-        Toasty.success(this,"Login google successed",Toast.LENGTH_SHORT);
+        Intent target = new Intent(LoginActivity.this, HistoryAndHobbyActivity.class);
+        startActivity(target);
     }
 
     @Override

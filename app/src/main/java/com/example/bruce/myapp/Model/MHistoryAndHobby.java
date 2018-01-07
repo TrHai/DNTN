@@ -16,6 +16,7 @@ import com.example.bruce.myapp.Data.Tourist_Location;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.HistoryAndHobby.IHistoryAndHobby;
 import com.example.bruce.myapp.Server;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -254,5 +256,13 @@ public class MHistoryAndHobby {
             }
         });
     }
+    MBigMap bigMap = new MBigMap();
+    public void handleLocationNearByList(LatLng myLocation,ArrayList<Tourist_Location> tourist_locations){
 
+        for(Tourist_Location tl : tourist_locations){
+            tl.setDistance(bigMap.Radius(myLocation,new LatLng(tl.getLatitude(),tl.getLongtitude())));
+        }
+        Collections.sort(tourist_locations);
+        callback.returnLocationNearByList(tourist_locations);
+    }
 }

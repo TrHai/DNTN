@@ -52,15 +52,17 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
         teamAdapter = new TeamAdapter(listUser, this);
         recyclerViewTeam.setAdapter(teamAdapter);
         teamAdapter.setClickListener(this);
+
         //Hiển thị Danh sách User lên recyclerView
         pTeam.receivedAddListUser(teamAdapter,listUser);
+
         FirebaseDatabase.getInstance().getReference("TeamUser").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists()) {
                     btnInvite.setVisibility(View.VISIBLE);
                     edtInvite.setVisibility(View.VISIBLE);
-                    linear.getLayoutParams().height= LinearLayout.LayoutParams.WRAP_CONTENT;
+                    linear.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 }
             }
             @Override
@@ -138,7 +140,7 @@ public class TeamActivity extends AppCompatActivity implements IViewTeam,TeamAda
 
     @Override
     public void itemClickMember(View view, int position) {
-        UserProfile userProfile=listUser.get(position);
+        UserProfile userProfile = listUser.get(position);
         FirebaseDatabase.getInstance().getReference("User").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

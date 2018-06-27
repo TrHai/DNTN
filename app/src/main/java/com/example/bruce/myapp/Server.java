@@ -11,4 +11,8 @@ public class Server {
     public static String url_RatingStar = "http://"+localHost+"/getratingstar.php";
     public static String url_SearchName= "http://"+localHost+ "/search.php?name=";
     public static String url_PostRating="https://"+localHost+"/postRating.php";
+
+    public static String url_TouristLocation_en = "http://"+localHost+"/getLocation.php";
+    public static String url_MoreInfomation_en = "http://"+localHost+ "/getDetailsLocation.php?iddulich=";
+
 }

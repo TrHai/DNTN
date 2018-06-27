@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bruce.myapp.Adapter.HistoryAdapter;
+import com.example.bruce.myapp.AddMissingLocation;
 import com.example.bruce.myapp.CircleTransform;
 import com.example.bruce.myapp.Data.Tourist_Location;
 import com.example.bruce.myapp.Data.UserProfile;
@@ -91,7 +92,7 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 99;
     ListView listView;
-    //gps
+    //gpsF
     GPSTracker gps = new GPSTracker(HistoryAndHobbyActivity.this);
 
     //biến lưu lịch sử
@@ -324,24 +325,24 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                 {
                     pMenuFragment.receivedLogout();
                 }
-                if(value == getString(R.string.Map)){
+                else if(value == getString(R.string.Map)){
                     Intent target = new Intent(HistoryAndHobbyActivity.this, BigMapsActivity.class);
                     target.putParcelableArrayListExtra("allLocation",allLocation);
                     startActivity(target);
                 }
-                if(value == getString(R.string.MyProfile)){
+                else if(value == getString(R.string.MyProfile)){
                     Intent target = new Intent(HistoryAndHobbyActivity.this, UserProfileActivity.class);
                     ArrayList<UserProfile> listUser=new ArrayList<>();
                     listUser.add(userProfile);
                     target.putParcelableArrayListExtra("user",listUser);
                     startActivity(target);
                 }
-                if(value==getString(R.string.Team))
+                else if(value==getString(R.string.Team))
                 {
                     Intent target = new Intent(HistoryAndHobbyActivity.this, TeamActivity.class);
                     startActivity(target);
                 }
-                if(value==getString(R.string.CreateTeam))
+                else if(value==getString(R.string.CreateTeam))
                 {
                     dialogCreateTeam = new Dialog(HistoryAndHobbyActivity.this);
                     dialogCreateTeam.setContentView(R.layout.dialog_create_team);
@@ -367,6 +368,11 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
                             dialogCreateTeam.dismiss();
                         }
                     });
+                }
+                else if(value==getString(R.string.AddMissingLocation))
+                {
+                    Intent target = new Intent(HistoryAndHobbyActivity.this, AddMissingLocation.class);
+                    startActivity(target);
                 }
             }
         });
@@ -558,7 +564,8 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         menuItem = new String[]{getString(R.string.MyProfile),
                 getString(R.string.Map),
                 getString(R.string.Logout),
-                getString(R.string.Team)};
+                getString(R.string.Team),
+                getString(R.string.AddMissingLocation)};
         ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
                 menuItem);
@@ -570,7 +577,8 @@ public class HistoryAndHobbyActivity extends AppCompatActivity implements IViewH
         menuItem = new String[]{getString(R.string.MyProfile),
                 getString(R.string.Map),
                 getString(R.string.Logout),
-                getString(R.string.CreateTeam)};
+                getString(R.string.CreateTeam),
+                getString(R.string.AddMissingLocation)};
         ArrayAdapter<String> listViewAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
                 menuItem);

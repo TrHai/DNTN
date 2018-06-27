@@ -237,8 +237,6 @@ public class UserProfileActivity extends AppCompatActivity implements IViewUserP
                             .setPhotoUri(Uri.parse(downloadUrl.toString()))
                             .build();
                     user.updateProfile(profileChangeRequest);
-
-
                 }
             });
 

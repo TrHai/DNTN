@@ -8,7 +8,7 @@
     <string name="Email">Email</string>
     <string name="Password">Mật khẩu</string>
     <string name="Login">Đăng nhập</string>
-    <string name="Create">Tạo mới</string>
+    <string name="Create">Đăng ký</string>
     <string name="Invite">Mời</string>
     <string name="Enteremail">Nhập email của bạn bè..</string>
     <string name="Name">Tên</string>
@@ -34,7 +34,12 @@
     <string name="Map">Bản đồ</string>
     <string name="Logout">Đăng Xuất</string>
     <string name="Team">Nhóm</string>
+    <string name="AddMissingLocation">Thêm địa điểm bi thiếu</string>
     <string name="ChangeLanguage">Thay đổi ngôn ngữ</string>
     <string name="Recommended">Đề Xuất cho bạn</string>
+    <string name="Since">Địa điểm bạn vừa chọn</string>
+    <string name="nearBy">Gần bạn</string>
     <string name="Enter_your_Chat_Message">Nhập tin nhắn...</string>
+    <string name="loginFB">Đăng nhập bằng Facebook</string>
+    <string name="loginGG">Đăng nhập bằng Google</string>
 </resources>

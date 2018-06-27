@@ -33,6 +33,7 @@
     <string name="Logout">Log out</string>
     <string name="CreateTeam">Create Team</string>
     <string name="Team">Team</string>
+    <string name="AddMissingLocation">Add Missing Location</string>
     <string name="ChangeLanguage">Change Language</string>
     <string name="Vietnamese">Vietnamese</string>
     <string name="English">English</string>
@@ -44,5 +45,6 @@
     <string name="Create_your_room_chat">Create your room chat</string>
     <string name="Create_room">Create room</string>
     <string name="nearBy">Near you</string>
-
+    <string name="loginFB">Continue with Facebook</string>
+    <string name="loginGG">Continue with Google</string>
 </resources>

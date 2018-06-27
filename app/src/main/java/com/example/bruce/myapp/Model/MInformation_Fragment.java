@@ -1,6 +1,8 @@
 package com.example.bruce.myapp.Model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -30,9 +32,17 @@ public class MInformation_Fragment {
     }
 
     public void handleLoadData(int location_ID, Context context){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String url_MoreInfomation="";
+        if (sharedPreferences.getString("language","").equals("vi")) {
+            url_MoreInfomation = Server.url_MoreInfomation;
+        }
+        else if(sharedPreferences.getString("language","").equals("en")){
+            url_MoreInfomation = Server.url_MoreInfomation_en;
+        }
         ArrayList<Information> informations = new ArrayList<>();
         RequestQueue requestQueue= Volley.newRequestQueue(context);
-        JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(Server.url_MoreInfomation+location_ID, new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(url_MoreInfomation+location_ID, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 if(response !=null)

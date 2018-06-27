@@ -2,7 +2,9 @@ package com.example.bruce.myapp.View.Login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.bruce.myapp.ActivityLanguage;
 import com.example.bruce.myapp.Data.UserProfile;
 import com.example.bruce.myapp.Presenter.Login.PLogin;
 import com.example.bruce.myapp.R;
@@ -36,6 +39,7 @@ import es.dmoral.toasty.Toasty;
 
 
 public class LoginActivity extends AppCompatActivity implements IViewLogin,GoogleApiClient.OnConnectionFailedListener {
+
     ImageView imgLogo;
     LoginButton btnLoginFB;
     CallbackManager callbackManager;
@@ -66,6 +70,8 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
         loginWithGG();
         HandleLoginEvent(btnLogin);
         CreateAccount();
+        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
+        Toast.makeText(this, sharedPreferences.getString("language",""), Toast.LENGTH_SHORT).show();
     }
 
     private void CreateAccount() {
@@ -240,10 +246,8 @@ public class LoginActivity extends AppCompatActivity implements IViewLogin,Googl
 
     @Override
     public void LoginChecker() {
-
         Intent target = new Intent(LoginActivity.this, HistoryAndHobbyActivity.class);
         startActivity(target);
-
     }
 
     @Override

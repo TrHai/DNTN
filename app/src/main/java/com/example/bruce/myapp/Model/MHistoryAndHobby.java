@@ -2,10 +2,13 @@ package com.example.bruce.myapp.Model;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -40,6 +43,7 @@ import java.util.Set;
 
 public class MHistoryAndHobby {
 
+
     IHistoryAndHobby callback;
     public MHistoryAndHobby() {
     }
@@ -72,44 +76,51 @@ public class MHistoryAndHobby {
         }
     }
     public void handleGetLocationData(Context context){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String url_TouristLocation="";
+        if (sharedPreferences.getString("language","").equals("vi")) {
+            url_TouristLocation = Server.url_TouristLocation;
+        }
+        else if(sharedPreferences.getString("language","").equals("en")){
+            url_TouristLocation = Server.url_TouristLocation_en;
+        }
+            ArrayList<Tourist_Location> tourist_locations = new ArrayList<>();
+            RequestQueue requestQueue= Volley.newRequestQueue(context);
+            JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(url_TouristLocation, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    if (response != null) {
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                Tourist_Location tourist_location = new Tourist_Location();
+                                JSONObject jsonObject = response.getJSONObject(i);
+                                tourist_location.location_ID = jsonObject.getInt("id");
+                                tourist_location.LocationName=jsonObject.getString("ten");
+                                tourist_location.Address=jsonObject.getString("diachi");
+                                tourist_location.Longtitude=jsonObject.getDouble("log");
+                                tourist_location.Latitude=jsonObject.getDouble("lat");
+                                tourist_location.LocationImg=jsonObject.getString("img");
+                                tourist_location.BasicInfo=jsonObject.getString("thongtincoban");
+                                tourist_location.province_ID=jsonObject.getInt("matinh");
+                                tourist_location.star = Float.parseFloat(jsonObject.getString("star"));
+                                tourist_location.kindOfLocation = jsonObject.getInt("maloai");
+                                tourist_locations.add(tourist_location);
 
-        ArrayList<Tourist_Location> tourist_locations = new ArrayList<>();
-        RequestQueue requestQueue= Volley.newRequestQueue(context);
-        JsonArrayRequest jsonArrayRequest=new JsonArrayRequest(Server.url_TouristLocation, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                if (response != null) {
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            Tourist_Location tourist_location = new Tourist_Location();
-                            JSONObject jsonObject = response.getJSONObject(i);
-                            tourist_location.location_ID = jsonObject.getInt("id");
-                            tourist_location.LocationName=jsonObject.getString("ten");
-                            tourist_location.Address=jsonObject.getString("diachi");
-                            tourist_location.Longtitude=jsonObject.getDouble("log");
-                            tourist_location.Latitude=jsonObject.getDouble("lat");
-                            tourist_location.LocationImg=jsonObject.getString("img");
-                            tourist_location.BasicInfo=jsonObject.getString("thongtincoban");
-                            tourist_location.province_ID=jsonObject.getInt("matinh");
-                            tourist_location.star = Float.parseFloat(jsonObject.getString("star"));
-                            tourist_location.kindOfLocation = jsonObject.getInt("maloai");
-                            tourist_locations.add(tourist_location);
-
+                            }
+                            catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        callback.GetLocationData(tourist_locations);
                     }
-                    callback.GetLocationData(tourist_locations);
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-            }
-        });
-        requestQueue.add(jsonArrayRequest);
+                }
+            });
+            requestQueue.add(jsonArrayRequest);
     }
 
     public void handleGetUserData(String userUid){

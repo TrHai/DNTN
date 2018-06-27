@@ -114,7 +114,7 @@
                 android:id="@+id/login_fb"
                 android:layout_width="wrap_content"
                 android:layout_height="39dp"
-                app:com_facebook_login_text="Continue with Facebook"
+                app:com_facebook_login_text="@string/loginFB"
                 app:com_facebook_logout_text="Logout" />
 
             <com.google.android.gms.common.SignInButton

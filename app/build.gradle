@@ -44,11 +44,14 @@ dependencies {
     compile 'com.google.firebase:firebase-storage:11.4.0'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.google.android.gms:play-services-maps:11.4.0'
+    compile 'com.google.android.gms:play-services-places:11.4.0'
     compile 'com.google.android.gms:play-services-auth:11.4.0'
     compile 'com.google.android.gms:play-services:11.4.0'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.firebase:geofire-android:2.1.2'
     compile 'com.koushikdutta.ion:ion:2.+'
+    compile 'com.droidninja:filepicker:1.0.0'
+
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

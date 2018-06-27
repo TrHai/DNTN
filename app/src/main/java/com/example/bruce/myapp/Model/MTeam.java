@@ -53,7 +53,7 @@ public class MTeam {
                                                 // callback.GetListUser(listUser);
                                                 Log.d("dsad","sad");
                                                 adapter.notifyDataSetChanged();
-//                                    teamAdapter.notifyDataSetChanged();
+                                                //teamAdapter.notifyDataSetChanged();
 
                                             }
                                         }
@@ -333,7 +333,7 @@ public class MTeam {
 
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
-                        Log.d("ádasds",dataSnapshot.getKey());
+
                     }
 
                     @Override
